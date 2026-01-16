@@ -18,16 +18,6 @@ interface StepNavigationProps {
 }
 
 const StepIndicator = ({ label, progress, onClick }: { label: string; progress: StepProgress; onClick?: () => void }) => {
-  const getCheckboxStyle = () => {
-    if (progress === "completed") {
-      return "bg-white border-2 border-[var(--control-primary)] flex items-center justify-center";
-    }
-    if (progress === "current") {
-      return "bg-white border-2 border-[var(--control-primary)] flex items-center justify-center";
-    }
-    return "bg-white border-2 border-[var(--border-neutral)]";
-  };
-
   const getTextStyle = () => {
     if (progress === "completed" || progress === "current") {
       return "text-[var(--label-primary)] font-medium";
@@ -40,18 +30,24 @@ const StepIndicator = ({ label, progress, onClick }: { label: string; progress: 
   return (
     <button
       onClick={onClick}
-      className={`flex-col gap-2 items-center px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors ${isCurrent ? "flex" : "hidden lg:flex"}`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors ${isCurrent ? "flex" : "hidden lg:flex"}`}
     >
-      <div className={`w-6 h-6 rounded-full hidden lg:flex ${getCheckboxStyle()}`}>
-        {progress === "completed" && (
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M2 7L6 11L12 3" stroke="var(--control-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        )}
-        {progress === "current" && (
-          <div className="w-3 h-3 rounded-full bg-[var(--control-primary)]" />
-        )}
-      </div>
+      {progress === "current" ? (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="12" fill="var(--control-primary)" />
+          <circle cx="12" cy="12" r="8" fill="white" />
+          <circle cx="12" cy="12" r="5" fill="var(--control-primary)" />
+        </svg>
+      ) : progress === "completed" ? (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="12" fill="var(--control-primary)" />
+          <path d="M7 12L10.5 15.5L17 8.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ) : (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" stroke="var(--border-neutral)" strokeWidth="2" />
+        </svg>
+      )}
       <p className={`text-base ${getTextStyle()} whitespace-nowrap`}>
         {label}
       </p>
