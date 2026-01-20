@@ -235,6 +235,16 @@ export default function Home() {
     setCurrentView("editor");
   };
 
+  const handleOpenSurvey = (id: number) => {
+    const survey = surveys.find((s) => s.id === id);
+    if (survey) {
+      setCurrentSurveyId(id);
+      setPageTitle(survey.name);
+      setCurrentStep(1); // Go to Questions
+      setCurrentView("editor");
+    }
+  };
+
   const handleEditSurvey = (id: number) => {
     const survey = surveys.find((s) => s.id === id);
     if (survey) {
@@ -312,6 +322,7 @@ export default function Home() {
             <SurveyListPage
               surveys={surveys}
               onCreateSurvey={handleCreateSurvey}
+              onOpenSurvey={handleOpenSurvey}
               onEditSurvey={handleEditSurvey}
               onDuplicateSurvey={handleDuplicateSurvey}
               onDeleteSurvey={handleDeleteSurvey}

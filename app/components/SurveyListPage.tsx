@@ -17,6 +17,7 @@ export interface Survey {
 interface SurveyListPageProps {
   surveys: Survey[];
   onCreateSurvey: () => void;
+  onOpenSurvey: (id: number) => void;
   onEditSurvey: (id: number) => void;
   onDuplicateSurvey: (id: number) => void;
   onDeleteSurvey: (id: number) => void;
@@ -48,8 +49,11 @@ const SurveyRowMenu = ({
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
       >
         <MoreVertical size={14} className="text-[var(--label-light)]" />
       </button>
@@ -57,31 +61,34 @@ const SurveyRowMenu = ({
       {isOpen && (
         <div className="absolute right-0 top-full mt-1 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1 min-w-[160px] z-20">
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               onDuplicate();
               setIsOpen(false);
             }}
-            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-100 transition-colors"
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Duplicate survey
           </button>
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               onEdit();
               setIsOpen(false);
             }}
-            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-100 transition-colors"
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Edit survey
           </button>
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               onDelete();
               setIsOpen(false);
             }}
-            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Delete survey
@@ -94,17 +101,22 @@ const SurveyRowMenu = ({
 
 const SurveyRow = ({
   survey,
+  onClick,
   onDuplicate,
   onEdit,
   onDelete,
 }: {
   survey: Survey;
+  onClick: () => void;
   onDuplicate: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }) => {
   return (
-    <div className="flex items-center p-6 border-b border-[var(--border)] hover:bg-gray-50/50 transition-colors">
+    <div
+      onClick={onClick}
+      className="flex items-center p-6 border-b border-[var(--border)] hover:bg-[#f5f5f4] transition-colors cursor-pointer"
+    >
       {/* Left - Name and stats */}
       <div className="flex-1 flex flex-col gap-1">
         <p
@@ -155,6 +167,7 @@ const SurveyRow = ({
 export const SurveyListPage: React.FC<SurveyListPageProps> = ({
   surveys,
   onCreateSurvey,
+  onOpenSurvey,
   onEditSurvey,
   onDuplicateSurvey,
   onDeleteSurvey,
@@ -198,6 +211,7 @@ export const SurveyListPage: React.FC<SurveyListPageProps> = ({
             <SurveyRow
               key={survey.id}
               survey={survey}
+              onClick={() => onOpenSurvey(survey.id)}
               onDuplicate={() => onDuplicateSurvey(survey.id)}
               onEdit={() => onEditSurvey(survey.id)}
               onDelete={() => onDeleteSurvey(survey.id)}
