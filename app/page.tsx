@@ -9,6 +9,7 @@ import { QuestionDetailPanel } from "./components/QuestionDetailPanel";
 import { RecipientsPage } from "./components/RecipientsPage";
 import { SettingsPage } from "./components/SettingsPage";
 import { ResultsPage } from "./components/ResultsPage";
+import { SurveyListPage, Survey } from "./components/SurveyListPage";
 
 // Initial state with a single question
 const initialQuestion: QuestionItem = {
@@ -29,7 +30,42 @@ interface Recipient {
   name: string;
 }
 
+// Sample surveys for the list
+const initialSurveys: Survey[] = [
+  {
+    id: 1,
+    name: "[Copy] Workcation Evaluation 2024 Barcelona",
+    questionCount: 5,
+    status: "draft",
+    lastUpdated: "07 March 2025",
+    createdBy: "Christian Højbo Møller",
+  },
+  {
+    id: 2,
+    name: "Workcation Evaluation 2024 Barcelona",
+    questionCount: 5,
+    status: "draft",
+    lastUpdated: "07 March 2025",
+    createdBy: "Christian Højbo Møller",
+  },
+  {
+    id: 3,
+    name: "Workcation Evaluation 2024 Barcelona",
+    questionCount: 5,
+    responseCount: 7,
+    status: "sent",
+    lastUpdated: "15 January 2026",
+    sentDate: "15 January 2026",
+    createdBy: "Christian Højbo Møller",
+  },
+];
+
 export default function Home() {
+  // View state: "list" shows survey list, "editor" shows survey editor
+  const [currentView, setCurrentView] = useState<"list" | "editor">("list");
+  const [surveys, setSurveys] = useState<Survey[]>(initialSurveys);
+  const [currentSurveyId, setCurrentSurveyId] = useState<number | null>(null);
+
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number>(1);
   const [questions, setQuestions] = useState<QuestionItem[]>([initialQuestion]);
@@ -178,6 +214,63 @@ export default function Home() {
     }
   };
 
+  // Survey list handlers
+  const handleCreateSurvey = () => {
+    const newId = Math.max(...surveys.map((s) => s.id), 0) + 1;
+    const newSurvey: Survey = {
+      id: newId,
+      name: "New Survey",
+      questionCount: 1,
+      status: "draft",
+      lastUpdated: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }),
+      createdBy: "You",
+    };
+    setSurveys([newSurvey, ...surveys]);
+    setCurrentSurveyId(newId);
+    setPageTitle("New Survey");
+    setQuestions([initialQuestion]);
+    setSelectedQuestionId(1);
+    setRecipients([]);
+    setCurrentStep(1);
+    setCurrentView("editor");
+  };
+
+  const handleEditSurvey = (id: number) => {
+    const survey = surveys.find((s) => s.id === id);
+    if (survey) {
+      setCurrentSurveyId(id);
+      setPageTitle(survey.name);
+      setCurrentStep(3); // Go to Settings
+      setCurrentView("editor");
+    }
+  };
+
+  const handleDuplicateSurvey = (id: number) => {
+    const survey = surveys.find((s) => s.id === id);
+    if (survey) {
+      const newId = Math.max(...surveys.map((s) => s.id), 0) + 1;
+      const duplicatedSurvey: Survey = {
+        ...survey,
+        id: newId,
+        name: `[Copy] ${survey.name}`,
+        status: "draft",
+        responseCount: undefined,
+        sentDate: undefined,
+        lastUpdated: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }),
+      };
+      setSurveys([duplicatedSurvey, ...surveys]);
+    }
+  };
+
+  const handleDeleteSurvey = (id: number) => {
+    setSurveys(surveys.filter((s) => s.id !== id));
+  };
+
+  const handleBackToList = () => {
+    setCurrentView("list");
+    setCurrentSurveyId(null);
+  };
+
   return (
     <div className="h-screen bg-[#fffaf6] overflow-hidden relative">
       {/* Navbar - floating on left */}
@@ -214,17 +307,29 @@ export default function Home() {
       {/* Main content - centered container */}
       <div className="h-full flex justify-center py-4 pl-[100px]">
         <div className="w-full max-w-[1300px] bg-white rounded-2xl border border-[var(--border)] flex flex-col overflow-hidden">
+
+          {currentView === "list" ? (
+            <SurveyListPage
+              surveys={surveys}
+              onCreateSurvey={handleCreateSurvey}
+              onEditSurvey={handleEditSurvey}
+              onDuplicateSurvey={handleDuplicateSurvey}
+              onDeleteSurvey={handleDeleteSurvey}
+            />
+          ) : (
+            <>
           {/* Page header */}
           <div className="border-b border-[var(--border)]">
           <div className="flex flex-col px-6 py-6">
             {/* Breadcrumbs */}
             <div className="flex items-center mb-1 pl-2">
-              <span
-                className="text-base text-[var(--label-light)] font-medium"
+              <button
+                onClick={handleBackToList}
+                className="text-base text-[var(--label-light)] font-medium hover:text-[var(--label-primary)] transition-colors"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
                 Custom surveys
-              </span>
+              </button>
               <div className="w-10 h-10 flex items-center justify-center">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <path d="M5 2L10 7L5 12" stroke="var(--label-light)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -402,6 +507,8 @@ export default function Home() {
             <ResultsPage questions={questions} />
           )}
           </div>
+            </>
+          )}
         </div>
       </div>
     </div>
