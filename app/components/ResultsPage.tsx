@@ -348,8 +348,8 @@ function calculateAverage(numbers: number[]): number {
   return numbers.reduce((a, b) => a + b, 0) / numbers.length;
 }
 
-// Text Summary Card Component
-const TextSummaryCard = ({ responses }: { responses: string[] }) => {
+// Text Summary Card Content Component (no wrapper)
+const TextSummaryCardContent = ({ responses }: { responses: string[] }) => {
   const summaryPoints = [
     "Overall positive sentiment about the event organization and venue",
     "Strong appreciation for networking and team bonding opportunities",
@@ -358,7 +358,7 @@ const TextSummaryCard = ({ responses }: { responses: string[] }) => {
   ];
 
   return (
-    <div className="bg-white border border-[var(--border)] rounded-xl p-5">
+    <>
       <div className="flex items-center gap-2 mb-3">
         <div className="w-6 h-6 rounded-full bg-[var(--accent)] flex items-center justify-center">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -376,14 +376,14 @@ const TextSummaryCard = ({ responses }: { responses: string[] }) => {
         ))}
       </ul>
       <p className="text-xs text-[var(--label-light)]">Based on {responses.length} responses</p>
-    </div>
+    </>
   );
 };
 
-// Donut Chart Component for Yes/No
-const YesNoDonutChart = ({ data }: { data: { yes: number; no: number } }) => {
+// Donut Chart Content Component for Yes/No (no wrapper)
+const YesNoDonutChartContent = ({ data }: { data: { yes: number; no: number } }) => {
   const total = data.yes + data.no;
-  const yesPercentage = Math.round((data.yes / total) * 100);
+  const yesPercentage = total > 0 ? Math.round((data.yes / total) * 100) : 0;
 
   const chartData = [
     { name: "Yes", value: data.yes },
@@ -393,7 +393,7 @@ const YesNoDonutChart = ({ data }: { data: { yes: number; no: number } }) => {
   const COLORS = ["#292524", "#d6d3d1"];
 
   return (
-    <div className="bg-white border border-[var(--border)] rounded-xl p-5">
+    <>
       <div className="flex items-center justify-center">
         <div className="relative w-[180px] h-[180px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -436,12 +436,12 @@ const YesNoDonutChart = ({ data }: { data: { yes: number; no: number } }) => {
           <span className="text-sm text-[var(--label-light)]">No ({data.no})</span>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
-// Distribution Bar Chart for Scale
-const ScaleBarChart = ({
+// Distribution Bar Chart Content for Scale (no wrapper)
+const ScaleBarChartContent = ({
   responses,
   scaleType,
 }: {
@@ -449,8 +449,8 @@ const ScaleBarChart = ({
   scaleType: "0-5" | "0-10";
 }) => {
   const max = scaleType === "0-5" ? 5 : 10;
-  const median = calculateMedian(responses);
-  const average = calculateAverage(responses);
+  const median = responses.length > 0 ? calculateMedian(responses) : 0;
+  const average = responses.length > 0 ? calculateAverage(responses) : 0;
 
   // Build distribution data
   const distribution: Record<number, number> = {};
@@ -467,7 +467,7 @@ const ScaleBarChart = ({
   }));
 
   return (
-    <div className="bg-white border border-[var(--border)] rounded-xl p-5">
+    <>
       <div className="h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
@@ -536,12 +536,12 @@ const ScaleBarChart = ({
           <span className="text-xs text-[var(--label-light)]">Responses</span>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
-// Vertical Bar Chart for Multiple Choice
-const MultipleChoiceBarChart = ({ data }: { data: Record<string, number> }) => {
+// Vertical Bar Chart Content for Multiple Choice (no wrapper)
+const MultipleChoiceBarChartContent = ({ data }: { data: Record<string, number> }) => {
   const chartData = Object.entries(data).map(([option, count]) => ({
     option: option.length > 20 ? option.substring(0, 20) + "..." : option,
     fullOption: option,
@@ -551,7 +551,7 @@ const MultipleChoiceBarChart = ({ data }: { data: Record<string, number> }) => {
   const total = Object.values(data).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="bg-white border border-[var(--border)] rounded-xl p-5">
+    <>
       <div className="h-[250px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -583,7 +583,7 @@ const MultipleChoiceBarChart = ({ data }: { data: Record<string, number> }) => {
               }}
               formatter={(value) => {
                 const numValue = value as number;
-                return [`${numValue} (${Math.round((numValue / total) * 100)}%)`, "Responses"];
+                return [`${numValue} (${total > 0 ? Math.round((numValue / total) * 100) : 0}%)`, "Responses"];
               }}
             />
             <Bar dataKey="count" fill="#292524" radius={[4, 4, 0, 0]} />
@@ -593,7 +593,7 @@ const MultipleChoiceBarChart = ({ data }: { data: Record<string, number> }) => {
       <p className="text-xs text-[var(--label-light)] text-center mt-2">
         {total} total responses
       </p>
-    </div>
+    </>
   );
 };
 
@@ -646,7 +646,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
 
       return {
         questionId: question.id,
+        questionNumber: question.number,
         questionText: question.questionText || `Question ${question.number}`,
+        description: question.description || "",
         questionType: question.questionType,
         scaleType: question.scaleType,
         multipleChoiceOptions: question.multipleChoiceOptions,
@@ -699,42 +701,52 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
             </div>
 
             {questionResponses.map((qr, index) => (
-              <div key={qr.questionId} className="space-y-3">
-                {/* Question header */}
-                <div className="flex items-start gap-3">
+              <div key={qr.questionId} className="bg-white border border-[var(--border)] rounded-xl overflow-hidden">
+                {/* Question header - inside card */}
+                <div className="flex items-start gap-3 p-5 border-b border-[var(--border)]">
                   <span
                     className="text-base text-[var(--label-light)] w-6 shrink-0 pt-0.5"
                     style={{ fontFamily: "DM Mono, monospace" }}
                   >
-                    {index + 1}
+                    {qr.questionNumber}
                   </span>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h3 className="text-base font-medium text-[var(--label-primary)]">
                       {qr.questionText}
                     </h3>
-                    <span className="text-xs text-[var(--label-light)]">
-                      {qr.questionType}
-                      {qr.questionType === "Scale" && ` (${qr.scaleType})`}
-                    </span>
+                    {qr.description && (
+                      <p className="text-sm text-[var(--label-light)] mt-1">
+                        {qr.description}
+                      </p>
+                    )}
                   </div>
+                  <span
+                    className="text-xs text-[var(--label-light)] shrink-0 px-2 py-1 bg-[var(--bg-neutral)] rounded"
+                    style={{ fontFamily: "Poppins, sans-serif" }}
+                  >
+                    {qr.questionType}
+                    {qr.questionType === "Scale" && ` (${qr.scaleType})`}
+                  </span>
                 </div>
 
-                {/* Chart based on question type */}
-                {qr.questionType === "Text" && (
-                  <TextSummaryCard responses={qr.responses as string[]} />
-                )}
-                {qr.questionType === "Yes-no" && (
-                  <YesNoDonutChart data={qr.responses as { yes: number; no: number }} />
-                )}
-                {qr.questionType === "Scale" && (
-                  <ScaleBarChart
-                    responses={qr.responses as number[]}
-                    scaleType={qr.scaleType || "0-5"}
-                  />
-                )}
-                {qr.questionType === "Multiple-choice" && (
-                  <MultipleChoiceBarChart data={qr.responses as Record<string, number>} />
-                )}
+                {/* Chart content - no border since it's inside card */}
+                <div className="p-5">
+                  {qr.questionType === "Text" && (
+                    <TextSummaryCardContent responses={qr.responses as string[]} />
+                  )}
+                  {qr.questionType === "Yes-no" && (
+                    <YesNoDonutChartContent data={qr.responses as { yes: number; no: number }} />
+                  )}
+                  {qr.questionType === "Scale" && (
+                    <ScaleBarChartContent
+                      responses={qr.responses as number[]}
+                      scaleType={qr.scaleType || "0-5"}
+                    />
+                  )}
+                  {qr.questionType === "Multiple-choice" && (
+                    <MultipleChoiceBarChartContent data={qr.responses as Record<string, number>} />
+                  )}
+                </div>
               </div>
             ))}
 

@@ -11,19 +11,105 @@ import { SettingsPage } from "./components/SettingsPage";
 import { ResultsPage } from "./components/ResultsPage";
 import { SurveyListPage, Survey } from "./components/SurveyListPage";
 
-// Initial state with a single question
-const initialQuestion: QuestionItem = {
-  id: 1,
-  number: "1",
-  questionText: "",
-  description: "",
-  questionType: "Text",
-  isRequired: false,
-  scaleType: "0-5",
-  scaleMinLabel: "",
-  scaleMaxLabel: "",
-  multipleChoiceOptions: ["", ""],
-};
+// Initial state with pizza-themed questions spanning all types
+const initialQuestions: QuestionItem[] = [
+  {
+    id: 1,
+    number: "1",
+    questionText: "What's your favorite pizza topping combination?",
+    description: "Describe your ideal pizza with all the toppings you love. Be as specific as you'd like!",
+    questionType: "Text",
+    isRequired: true,
+    scaleType: "0-5",
+    scaleMinLabel: "",
+    scaleMaxLabel: "",
+    multipleChoiceOptions: ["", ""],
+  },
+  {
+    id: 2,
+    number: "2",
+    questionText: "How would you rate the quality of our pizza crust?",
+    description: "Consider factors like crispiness, chewiness, and overall texture.",
+    questionType: "Scale",
+    isRequired: true,
+    scaleType: "0-10",
+    scaleMinLabel: "Terrible",
+    scaleMaxLabel: "Perfect",
+    multipleChoiceOptions: ["", ""],
+  },
+  {
+    id: 3,
+    number: "3",
+    questionText: "Do you prefer pineapple on pizza?",
+    description: "The age-old debate - where do you stand on Hawaiian pizza?",
+    questionType: "Yes-no",
+    isRequired: false,
+    scaleType: "0-5",
+    scaleMinLabel: "",
+    scaleMaxLabel: "",
+    multipleChoiceOptions: ["", ""],
+  },
+  {
+    id: 4,
+    number: "4",
+    questionText: "What type of pizza crust do you prefer?",
+    description: "Select the crust style that makes your perfect pizza.",
+    questionType: "Multiple-choice",
+    isRequired: true,
+    scaleType: "0-5",
+    scaleMinLabel: "",
+    scaleMaxLabel: "",
+    multipleChoiceOptions: ["Thin & Crispy", "Hand-tossed Traditional", "Deep Dish Chicago Style", "Neapolitan Wood-fired", "Stuffed Crust"],
+  },
+  {
+    id: 5,
+    number: "5",
+    questionText: "How satisfied are you with pizza delivery times in your area?",
+    description: "Think about your recent delivery experiences.",
+    questionType: "Scale",
+    isRequired: false,
+    scaleType: "0-5",
+    scaleMinLabel: "Very Dissatisfied",
+    scaleMaxLabel: "Very Satisfied",
+    multipleChoiceOptions: ["", ""],
+  },
+  {
+    id: 6,
+    number: "6",
+    questionText: "Would you recommend our pizzeria to a friend?",
+    description: "Based on your overall experience with our food and service.",
+    questionType: "Yes-no",
+    isRequired: true,
+    scaleType: "0-5",
+    scaleMinLabel: "",
+    scaleMaxLabel: "",
+    multipleChoiceOptions: ["", ""],
+  },
+  {
+    id: 7,
+    number: "7",
+    questionText: "What improvements would you suggest for our menu?",
+    description: "We're always looking to improve. Share your ideas for new items, changes, or anything else!",
+    questionType: "Text",
+    isRequired: false,
+    scaleType: "0-5",
+    scaleMinLabel: "",
+    scaleMaxLabel: "",
+    multipleChoiceOptions: ["", ""],
+  },
+  {
+    id: 8,
+    number: "8",
+    questionText: "When do you typically order pizza?",
+    description: "Select all the occasions when you're most likely to order.",
+    questionType: "Multiple-choice",
+    isRequired: false,
+    scaleType: "0-5",
+    scaleMinLabel: "",
+    scaleMaxLabel: "",
+    multipleChoiceOptions: ["Weeknight dinner", "Weekend treat", "Parties & gatherings", "Late night snack", "Lunch break"],
+  },
+];
 
 interface Recipient {
   id: number;
@@ -68,7 +154,7 @@ export default function Home() {
 
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number>(1);
-  const [questions, setQuestions] = useState<QuestionItem[]>([initialQuestion]);
+  const [questions, setQuestions] = useState<QuestionItem[]>(initialQuestions);
   const [deleteError, setDeleteError] = useState<number | null>(null);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [movingQuestionId, setMovingQuestionId] = useState<number | null>(null);
@@ -228,7 +314,18 @@ export default function Home() {
     setSurveys([newSurvey, ...surveys]);
     setCurrentSurveyId(newId);
     setPageTitle("New Survey");
-    setQuestions([initialQuestion]);
+    setQuestions([{
+      id: 1,
+      number: "1",
+      questionText: "",
+      description: "",
+      questionType: "Text",
+      isRequired: false,
+      scaleType: "0-5",
+      scaleMinLabel: "",
+      scaleMaxLabel: "",
+      multipleChoiceOptions: ["", ""],
+    }]);
     setSelectedQuestionId(1);
     setRecipients([]);
     setCurrentStep(1);
