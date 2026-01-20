@@ -1,11 +1,13 @@
 "use client"
 
 import React, { useState, useRef } from "react";
+import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle } from "react-feather";
 import { StepNavigation } from "./components/StepNavigation";
 import { QuestionListSidebar, QuestionItem } from "./components/QuestionListSidebar";
 import { QuestionDetailPanel } from "./components/QuestionDetailPanel";
 import { RecipientsPage } from "./components/RecipientsPage";
 import { SettingsPage } from "./components/SettingsPage";
+import { ResultsPage } from "./components/ResultsPage";
 
 // Initial state with a single question
 const initialQuestion: QuestionItem = {
@@ -158,9 +160,37 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen bg-[var(--background)]">
-      {/* Collapsed navbar */}
-      <div className="w-[68px] bg-white border-r border-[var(--border)]" />
+    <div className="flex h-screen bg-[#fffaf6]">
+      {/* Navbar */}
+      <div className="w-[68px] bg-white border-r border-[var(--border)] flex flex-col items-center py-4">
+        {/* Logo placeholder */}
+        <div className="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center mb-6">
+          <span className="text-white font-bold text-lg">C</span>
+        </div>
+
+        {/* Nav icons */}
+        <div className="flex flex-col items-center gap-2">
+          <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
+            <HomeIcon size={20} />
+          </button>
+          <button className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--bg-neutral)] text-[var(--label-primary)]">
+            <PlusCircle size={20} />
+          </button>
+          <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
+            <Settings size={20} />
+          </button>
+        </div>
+
+        {/* Bottom icons */}
+        <div className="mt-auto flex flex-col items-center gap-2">
+          <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
+            <HelpCircle size={20} />
+          </button>
+          <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
+            <User size={20} />
+          </button>
+        </div>
+      </div>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -336,19 +366,7 @@ export default function Home() {
           )}
 
           {currentStep === 4 && (
-            <div className="flex-1 flex items-center justify-center bg-[#fafaf9]">
-              <div className="text-center">
-                <h2
-                  className="text-2xl font-medium text-[var(--label-primary)] mb-2"
-                  style={{ fontFamily: "Bitter, serif" }}
-                >
-                  Results
-                </h2>
-                <p className="text-base text-[var(--label-light)]">
-                  Survey results will appear here once responses are collected.
-                </p>
-              </div>
-            </div>
+            <ResultsPage questions={questions} />
           )}
         </div>
       </div>
