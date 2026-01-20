@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -14,15 +14,253 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from "recharts";
+import { ChevronDown } from "react-feather";
 import { QuestionItem } from "./QuestionListSidebar";
 
 interface ResultsPageProps {
   questions: QuestionItem[];
 }
 
-// Dummy data generation functions
-function generateTextResponses(): string[] {
-  return [
+// Dimension definitions
+const DIMENSIONS = {
+  department: {
+    label: "Department",
+    segments: ["Engineering", "Product", "Design", "Marketing", "Sales", "Operations", "HR", "Finance"],
+  },
+  location: {
+    label: "Location",
+    segments: ["San Francisco", "New York", "London", "Berlin", "Tokyo", "Remote"],
+  },
+  tenure: {
+    label: "Tenure",
+    segments: ["< 1 year", "1-2 years", "2-5 years", "5+ years"],
+  },
+  level: {
+    label: "Level",
+    segments: ["Individual Contributor", "Manager", "Senior Manager", "Director", "VP+"],
+  },
+} as const;
+
+type DimensionKey = keyof typeof DIMENSIONS;
+
+interface Employee {
+  id: number;
+  name: string;
+  department: string;
+  location: string;
+  tenure: string;
+  level: string;
+}
+
+// Generate 60 fake employees
+const generateEmployees = (): Employee[] => {
+  const firstNames = [
+    "Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Quinn", "Avery", "Sage",
+    "Dakota", "Reese", "Skyler", "Charlie", "Drew", "Emery", "Finley", "Hayden", "Kennedy", "Lane",
+    "Marley", "Noah", "Oakley", "Parker", "Peyton", "Phoenix", "Remy", "River", "Rowan", "Sawyer",
+    "Spencer", "Sydney", "Tatum", "Terry", "Val", "Blake", "Cameron", "Devon", "Ellis", "Francis",
+    "Gray", "Harper", "Indie", "Jesse", "Kai", "Lee", "Logan", "Micah", "Noel", "Ollie",
+    "Pat", "Ray", "Robin", "Sam", "Shannon", "Shawn", "Toby", "Tracy", "Winter", "Zion",
+  ];
+
+  const lastNames = [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
+    "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
+    "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson",
+  ];
+
+  const employees: Employee[] = [];
+
+  for (let i = 0; i < 60; i++) {
+    const firstName = firstNames[i % firstNames.length];
+    const lastName = lastNames[Math.floor(i / 2) % lastNames.length];
+
+    employees.push({
+      id: i + 1,
+      name: `${firstName} ${lastName}`,
+      department: DIMENSIONS.department.segments[Math.floor(Math.random() * DIMENSIONS.department.segments.length)],
+      location: DIMENSIONS.location.segments[Math.floor(Math.random() * DIMENSIONS.location.segments.length)],
+      tenure: DIMENSIONS.tenure.segments[Math.floor(Math.random() * DIMENSIONS.tenure.segments.length)],
+      level: DIMENSIONS.level.segments[Math.floor(Math.random() * DIMENSIONS.level.segments.length)],
+    });
+  }
+
+  return employees;
+};
+
+const EMPLOYEES = generateEmployees();
+
+// Filter Dropdown Component
+interface FilterDropdownProps {
+  label: string;
+  options: string[];
+  value: string | null;
+  onChange: (value: string | null) => void;
+  placeholder?: string;
+}
+
+const FilterDropdown: React.FC<FilterDropdownProps> = ({
+  label,
+  options,
+  value,
+  onChange,
+  placeholder = "All",
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-1.5" ref={dropdownRef}>
+      <label className="text-xs text-[var(--label-light)]" style={{ fontFamily: "Poppins, sans-serif" }}>
+        {label}
+      </label>
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="h-10 px-3 pr-8 bg-white border border-[var(--border)] rounded-lg text-sm text-left min-w-[160px] hover:bg-gray-50 transition-colors flex items-center justify-between"
+          style={{ fontFamily: "Poppins, sans-serif" }}
+        >
+          <span className={value ? "text-[var(--label-primary)]" : "text-[var(--label-light)]"}>
+            {value || placeholder}
+          </span>
+          <ChevronDown
+            size={16}
+            className={`absolute right-2 text-[var(--label-light)] transition-transform ${isOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {isOpen && (
+          <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1 max-h-[240px] overflow-y-auto">
+            <button
+              onClick={() => {
+                onChange(null);
+                setIsOpen(false);
+              }}
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 transition-colors ${
+                !value ? "bg-gray-50 text-[var(--label-primary)]" : "text-[var(--label-light)]"
+              }`}
+              style={{ fontFamily: "Poppins, sans-serif" }}
+            >
+              All
+            </button>
+            {options.map((option) => (
+              <button
+                key={option}
+                onClick={() => {
+                  onChange(option);
+                  setIsOpen(false);
+                }}
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 transition-colors ${
+                  value === option ? "bg-gray-50 text-[var(--label-primary)]" : "text-[var(--label-primary)]"
+                }`}
+                style={{ fontFamily: "Poppins, sans-serif" }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Dimension Dropdown Component
+interface DimensionDropdownProps {
+  value: DimensionKey | null;
+  onChange: (value: DimensionKey | null) => void;
+}
+
+const DimensionDropdown: React.FC<DimensionDropdownProps> = ({ value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const dimensionOptions = Object.entries(DIMENSIONS).map(([key, { label }]) => ({
+    key: key as DimensionKey,
+    label,
+  }));
+
+  return (
+    <div className="flex flex-col gap-1.5" ref={dropdownRef}>
+      <label className="text-xs text-[var(--label-light)]" style={{ fontFamily: "Poppins, sans-serif" }}>
+        Filter by
+      </label>
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="h-10 px-3 pr-8 bg-white border border-[var(--border)] rounded-lg text-sm text-left min-w-[160px] hover:bg-gray-50 transition-colors flex items-center justify-between"
+          style={{ fontFamily: "Poppins, sans-serif" }}
+        >
+          <span className={value ? "text-[var(--label-primary)]" : "text-[var(--label-light)]"}>
+            {value ? DIMENSIONS[value].label : "Select dimension"}
+          </span>
+          <ChevronDown
+            size={16}
+            className={`absolute right-2 text-[var(--label-light)] transition-transform ${isOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {isOpen && (
+          <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1">
+            <button
+              onClick={() => {
+                onChange(null);
+                setIsOpen(false);
+              }}
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 transition-colors ${
+                !value ? "bg-gray-50 text-[var(--label-primary)]" : "text-[var(--label-light)]"
+              }`}
+              style={{ fontFamily: "Poppins, sans-serif" }}
+            >
+              No filter
+            </button>
+            {dimensionOptions.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => {
+                  onChange(key);
+                  setIsOpen(false);
+                }}
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 transition-colors ${
+                  value === key ? "bg-gray-50 text-[var(--label-primary)]" : "text-[var(--label-primary)]"
+                }`}
+                style={{ fontFamily: "Poppins, sans-serif" }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Dummy data generation functions - now accept respondent count
+function generateTextResponses(respondentCount: number): string[] {
+  const allResponses = [
     "The event was very well organized and informative.",
     "I learned a lot about team collaboration techniques.",
     "The venue was excellent, great location and facilities.",
@@ -33,21 +271,36 @@ function generateTextResponses(): string[] {
     "Schedule was a bit too packed, needed more breaks.",
     "Great team bonding experience overall.",
     "Looking forward to the next one!",
+    "Really appreciated the attention to detail.",
+    "The breakout sessions were particularly useful.",
+    "Could use more time for Q&A.",
+    "Excellent catering and refreshments.",
+    "The agenda was well-structured.",
+    "Loved the collaborative workshop format.",
+    "Would recommend to colleagues.",
+    "Very insightful presentations.",
+    "Good balance of work and social activities.",
+    "The facilitators were professional and helpful.",
   ];
+
+  // Return a subset based on respondent count
+  const count = Math.min(respondentCount, allResponses.length);
+  return allResponses.slice(0, count);
 }
 
-function generateYesNoResponses(): { yes: number; no: number } {
-  const yes = Math.floor(Math.random() * 60) + 40; // 40-100
-  const no = Math.floor(Math.random() * 30) + 10; // 10-40
+function generateYesNoResponses(respondentCount: number): { yes: number; no: number } {
+  // Distribute responses based on respondent count
+  const yesRatio = 0.6 + Math.random() * 0.25; // 60-85% yes
+  const yes = Math.round(respondentCount * yesRatio);
+  const no = respondentCount - yes;
   return { yes, no };
 }
 
-function generateScaleResponses(scaleType: "0-5" | "0-10"): number[] {
+function generateScaleResponses(scaleType: "0-5" | "0-10", respondentCount: number): number[] {
   const max = scaleType === "0-5" ? 5 : 10;
   const responses: number[] = [];
-  const total = Math.floor(Math.random() * 50) + 80; // 80-130 responses
 
-  for (let i = 0; i < total; i++) {
+  for (let i = 0; i < respondentCount; i++) {
     // Weighted towards higher scores (bell curve shifted right)
     const rand = Math.random();
     let value: number;
@@ -62,13 +315,22 @@ function generateScaleResponses(scaleType: "0-5" | "0-10"): number[] {
   return responses;
 }
 
-function generateMultipleChoiceResponses(options: string[]): Record<string, number> {
+function generateMultipleChoiceResponses(options: string[], respondentCount: number): Record<string, number> {
   const result: Record<string, number> = {};
-  options.forEach((option) => {
-    if (option.trim()) {
-      result[option] = Math.floor(Math.random() * 40) + 10; // 10-50 responses per option
+  const validOptions = options.filter(o => o.trim());
+
+  // Distribute respondents across options (each person picks one)
+  let remaining = respondentCount;
+  validOptions.forEach((option, index) => {
+    if (index === validOptions.length - 1) {
+      result[option] = remaining;
+    } else {
+      const share = Math.floor(remaining * (0.1 + Math.random() * 0.4));
+      result[option] = share;
+      remaining -= share;
     }
   });
+
   return result;
 }
 
@@ -338,25 +600,44 @@ const MultipleChoiceBarChart = ({ data }: { data: Record<string, number> }) => {
 // Main Results Page Component
 export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
   const [showData, setShowData] = useState(false);
+  const [selectedDimension, setSelectedDimension] = useState<DimensionKey | null>(null);
+  const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
+
+  // Reset segment when dimension changes
+  const handleDimensionChange = (dimension: DimensionKey | null) => {
+    setSelectedDimension(dimension);
+    setSelectedSegment(null);
+  };
+
+  // Filter employees based on selection
+  const filteredEmployees = useMemo(() => {
+    if (!selectedDimension || !selectedSegment) {
+      return EMPLOYEES;
+    }
+    return EMPLOYEES.filter((emp) => emp[selectedDimension] === selectedSegment);
+  }, [selectedDimension, selectedSegment]);
 
   // Generate dummy data for all questions (memoized to prevent regeneration)
   const questionResponses = useMemo(() => {
+    const respondentCount = filteredEmployees.length;
+
     return questions.map((question) => {
       let responses: unknown;
 
       switch (question.questionType) {
         case "Text":
-          responses = generateTextResponses();
+          responses = generateTextResponses(respondentCount);
           break;
         case "Yes-no":
-          responses = generateYesNoResponses();
+          responses = generateYesNoResponses(respondentCount);
           break;
         case "Scale":
-          responses = generateScaleResponses(question.scaleType || "0-5");
+          responses = generateScaleResponses(question.scaleType || "0-5", respondentCount);
           break;
         case "Multiple-choice":
           responses = generateMultipleChoiceResponses(
-            question.multipleChoiceOptions || ["Option A", "Option B", "Option C"]
+            question.multipleChoiceOptions || ["Option A", "Option B", "Option C"],
+            respondentCount
           );
           break;
         default:
@@ -372,7 +653,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
         responses,
       };
     });
-  }, [questions]);
+  }, [questions, filteredEmployees.length]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-neutral)]">
@@ -394,6 +675,29 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
       {showData ? (
         <div className="flex-1 overflow-y-auto px-6 pb-6">
           <div className="max-w-[900px] mx-auto space-y-6">
+            {/* Filter bar */}
+            <div className="bg-white border border-[var(--border)] rounded-xl p-4">
+              <div className="flex items-end gap-4 flex-wrap">
+                <DimensionDropdown
+                  value={selectedDimension}
+                  onChange={handleDimensionChange}
+                />
+                {selectedDimension && (
+                  <FilterDropdown
+                    label={DIMENSIONS[selectedDimension].label}
+                    options={[...DIMENSIONS[selectedDimension].segments]}
+                    value={selectedSegment}
+                    onChange={setSelectedSegment}
+                    placeholder="All"
+                  />
+                )}
+                <div className="flex-1" />
+                <div className="text-sm text-[var(--label-light)] pb-2" style={{ fontFamily: "Poppins, sans-serif" }}>
+                  {filteredEmployees.length} of {EMPLOYEES.length} respondents
+                </div>
+              </div>
+            </div>
+
             {questionResponses.map((qr, index) => (
               <div key={qr.questionId} className="space-y-3">
                 {/* Question header */}

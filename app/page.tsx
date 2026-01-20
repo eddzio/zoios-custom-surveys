@@ -429,6 +429,7 @@ export default function Home() {
                 selectedQuestionId={selectedQuestionId}
                 onQuestionSelect={handleQuestionSelect}
                 onAddQuestion={handleAddQuestion}
+                onMoveQuestion={handleMoveQuestion}
               />
 
               {/* Question detail panels - ALL questions */}
