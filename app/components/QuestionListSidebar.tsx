@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react";
+import { motion } from "framer-motion";
 
 export interface QuestionItem {
   id: number;
@@ -90,12 +91,18 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
         </div>
         <div className="flex-1 flex flex-col gap-1 overflow-y-auto">
           {questions.map((question) => (
-            <QuestionRow
+            <motion.div
               key={question.id}
-              question={question}
-              isSelected={selectedQuestionId === question.id}
-              onClick={() => onQuestionSelect?.(question.id)}
-            />
+              layout
+              layoutId={`question-row-${question.id}`}
+              transition={{ type: "spring", mass: 1, stiffness: 230, damping: 25 }}
+            >
+              <QuestionRow
+                question={question}
+                isSelected={selectedQuestionId === question.id}
+                onClick={() => onQuestionSelect?.(question.id)}
+              />
+            </motion.div>
           ))}
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from "react";
+import { motion } from "framer-motion";
 import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle } from "react-feather";
 import { StepNavigation } from "./components/StepNavigation";
 import { QuestionListSidebar, QuestionItem } from "./components/QuestionListSidebar";
@@ -159,6 +160,21 @@ export default function Home() {
     setDeleteError(null);
   };
 
+  const handleMoveQuestion = (id: number, direction: 'up' | 'down') => {
+    const index = questions.findIndex((q) => q.id === id);
+    if (index === -1) return;
+
+    if (direction === 'up' && index > 0) {
+      const newQuestions = [...questions];
+      [newQuestions[index], newQuestions[index - 1]] = [newQuestions[index - 1], newQuestions[index]];
+      setQuestions(newQuestions);
+    } else if (direction === 'down' && index < questions.length - 1) {
+      const newQuestions = [...questions];
+      [newQuestions[index], newQuestions[index + 1]] = [newQuestions[index + 1], newQuestions[index]];
+      setQuestions(newQuestions);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-[#fffaf6]">
       {/* Navbar */}
@@ -299,8 +315,11 @@ export default function Home() {
               <div className="flex-1 bg-[#fafaf9] p-3 overflow-y-auto">
                 <div className="max-w-[900px] mx-auto flex flex-col gap-3">
                   {questions.map((question) => (
-                    <div
+                    <motion.div
                       key={question.id}
+                      layout
+                      layoutId={`question-card-${question.id}`}
+                      transition={{ type: "spring", mass: 1, stiffness: 230, damping: 25 }}
                       id={`question-${question.id}`}
                       onClick={() => setSelectedQuestionId(question.id)}
                       className={`cursor-pointer ${selectedQuestionId === question.id ? "ring-1 ring-[var(--control-primary)] ring-opacity-30 rounded-2xl" : ""}`}
@@ -316,6 +335,8 @@ export default function Home() {
                         scaleMinLabel={question.scaleMinLabel}
                         scaleMaxLabel={question.scaleMaxLabel}
                         multipleChoiceOptions={question.multipleChoiceOptions}
+                        canMoveUp={questions.findIndex((q) => q.id === question.id) > 0}
+                        canMoveDown={questions.findIndex((q) => q.id === question.id) < questions.length - 1}
                         onQuestionChange={(text) => updateQuestion(question.id, { questionText: text })}
                         onDescriptionChange={(text) => updateQuestion(question.id, { description: text })}
                         onTypeChange={(type) => updateQuestion(question.id, { questionType: type })}
@@ -334,8 +355,10 @@ export default function Home() {
                           }, 100);
                         }}
                         onDelete={() => handleDeleteQuestion(question.id)}
+                        onMoveUp={() => handleMoveQuestion(question.id, 'up')}
+                        onMoveDown={() => handleMoveQuestion(question.id, 'down')}
                       />
-                    </div>
+                    </motion.div>
                   ))}
                   {/* Add question button */}
                   <button

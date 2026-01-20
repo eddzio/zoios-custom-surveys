@@ -19,6 +19,9 @@ interface QuestionDetailProps {
   scaleMaxLabel?: string;
   // Multiple-choice specific props
   multipleChoiceOptions?: string[];
+  // Move controls
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
   onQuestionChange?: (text: string) => void;
   onDescriptionChange?: (text: string) => void;
   onTypeChange?: (type: QuestionType) => void;
@@ -29,6 +32,8 @@ interface QuestionDetailProps {
   onMultipleChoiceOptionsChange?: (options: string[]) => void;
   onCopy?: () => void;
   onDelete?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }
 
 const TypeSelector = ({
@@ -283,6 +288,8 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
   scaleMinLabel = "",
   scaleMaxLabel = "",
   multipleChoiceOptions = [""],
+  canMoveUp = false,
+  canMoveDown = false,
   onQuestionChange,
   onDescriptionChange,
   onTypeChange,
@@ -293,6 +300,8 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
   onMultipleChoiceOptionsChange,
   onCopy,
   onDelete,
+  onMoveUp,
+  onMoveDown,
 }) => {
   return (
     <div className="bg-white border border-[var(--border)] rounded-2xl overflow-hidden">
@@ -386,6 +395,53 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
             onChange={(e) => onDescriptionChange?.(e.target.value)}
             className="h-10 px-3 py-1 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
           />
+        </div>
+        {/* Move Up/Down Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveDown?.();
+            }}
+            disabled={!canMoveDown}
+            className={`w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm ${
+              canMoveDown ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+            }`}
+            title="Move down"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              stroke="var(--label-light)"
+              strokeWidth="1.5"
+            >
+              <path d="M7 2v10M3 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveUp?.();
+            }}
+            disabled={!canMoveUp}
+            className={`w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm ${
+              canMoveUp ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+            }`}
+            title="Move up"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              stroke="var(--label-light)"
+              strokeWidth="1.5"
+            >
+              <path d="M7 12V2M3 6l4-4 4 4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
         {questionType === "Scale" && (
           <ScaleOptions
