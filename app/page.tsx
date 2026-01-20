@@ -35,6 +35,7 @@ export default function Home() {
   const [questions, setQuestions] = useState<QuestionItem[]>([initialQuestion]);
   const [deleteError, setDeleteError] = useState<number | null>(null);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [movingQuestionId, setMovingQuestionId] = useState<number | null>(null);
 
   // Page title state
   const [pageTitle, setPageTitle] = useState("Workcation Evaluation 2024 Barcelona");
@@ -163,6 +164,8 @@ export default function Home() {
   const handleMoveQuestion = (id: number, direction: 'up' | 'down') => {
     const index = questions.findIndex((q) => q.id === id);
     if (index === -1) return;
+
+    setMovingQuestionId(id);
 
     if (direction === 'up' && index > 0) {
       const newQuestions = [...questions];
@@ -320,9 +323,15 @@ export default function Home() {
                       layout
                       layoutId={`question-card-${question.id}`}
                       transition={{ type: "spring", mass: 1, stiffness: 230, damping: 25 }}
+                      onLayoutAnimationComplete={() => {
+                        if (movingQuestionId === question.id) {
+                          setMovingQuestionId(null);
+                        }
+                      }}
                       id={`question-${question.id}`}
                       onClick={() => setSelectedQuestionId(question.id)}
-                      className={`cursor-pointer ${selectedQuestionId === question.id ? "ring-1 ring-[var(--control-primary)] ring-opacity-30 rounded-2xl" : ""}`}
+                      style={{ zIndex: movingQuestionId === question.id ? 10 : 1 }}
+                      className={`relative cursor-pointer ${selectedQuestionId === question.id ? "ring-1 ring-[var(--control-primary)] ring-opacity-30 rounded-2xl" : ""}`}
                     >
                       <QuestionDetailPanel
                         questionNumber={question.number}
