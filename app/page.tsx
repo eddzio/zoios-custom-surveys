@@ -179,9 +179,9 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen bg-[#fffaf6]">
-      {/* Navbar */}
-      <div className="w-[68px] bg-white border-r border-[var(--border)] flex flex-col items-center py-4">
+    <div className="h-screen bg-[#fffaf6] overflow-hidden relative">
+      {/* Navbar - floating on left */}
+      <div className="fixed left-4 top-[68px] bottom-4 w-[68px] bg-white border border-[var(--border)] rounded-2xl flex flex-col items-center py-4 z-10">
         {/* Logo placeholder */}
         <div className="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center mb-6">
           <span className="text-white font-bold text-lg">C</span>
@@ -211,10 +211,11 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Page header */}
-        <div className="bg-white border-b border-[var(--border)]">
+      {/* Main content - centered container */}
+      <div className="h-full flex justify-center py-4 pl-[100px]">
+        <div className="w-full max-w-[1300px] bg-white rounded-2xl border border-[var(--border)] flex flex-col overflow-hidden">
+          {/* Page header */}
+          <div className="border-b border-[var(--border)]">
           <div className="flex flex-col px-6 py-6">
             {/* Breadcrumbs */}
             <div className="flex items-center mb-1 pl-2">
@@ -291,19 +292,19 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Step navigation */}
-        <div className="flex items-center justify-center bg-white">
-          <StepNavigation
-            steps={steps}
-            currentStep={currentStep}
-            onBack={handleBack}
-            onForward={handleForward}
-            onStepClick={setCurrentStep}
-          />
-        </div>
+          {/* Step navigation */}
+          <div className="flex items-center justify-center">
+            <StepNavigation
+              steps={steps}
+              currentStep={currentStep}
+              onBack={handleBack}
+              onForward={handleForward}
+              onStepClick={setCurrentStep}
+            />
+          </div>
 
-        {/* Main content area */}
-        <div className="flex-1 flex overflow-hidden">
+          {/* Main content area */}
+          <div className="flex-1 flex overflow-hidden">
           {currentStep === 1 && (
             <>
               {/* Question list sidebar */}
@@ -400,6 +401,7 @@ export default function Home() {
           {currentStep === 4 && (
             <ResultsPage questions={questions} />
           )}
+          </div>
         </div>
       </div>
     </div>
