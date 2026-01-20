@@ -396,6 +396,22 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
             className="h-10 px-3 py-1 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
           />
         </div>
+        {questionType === "Scale" && (
+          <ScaleOptions
+            scaleType={scaleType}
+            minLabel={scaleMinLabel}
+            maxLabel={scaleMaxLabel}
+            onScaleTypeChange={(type) => onScaleTypeChange?.(type)}
+            onMinLabelChange={(label) => onScaleMinLabelChange?.(label)}
+            onMaxLabelChange={(label) => onScaleMaxLabelChange?.(label)}
+          />
+        )}
+        {questionType === "Multiple-choice" && (
+          <MultipleChoiceOptions
+            options={multipleChoiceOptions}
+            onOptionsChange={(options) => onMultipleChoiceOptionsChange?.(options)}
+          />
+        )}
         {/* Move Up/Down Buttons */}
         <div className="flex gap-2">
           <button
@@ -443,22 +459,6 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
             </svg>
           </button>
         </div>
-        {questionType === "Scale" && (
-          <ScaleOptions
-            scaleType={scaleType}
-            minLabel={scaleMinLabel}
-            maxLabel={scaleMaxLabel}
-            onScaleTypeChange={(type) => onScaleTypeChange?.(type)}
-            onMinLabelChange={(label) => onScaleMinLabelChange?.(label)}
-            onMaxLabelChange={(label) => onScaleMaxLabelChange?.(label)}
-          />
-        )}
-        {questionType === "Multiple-choice" && (
-          <MultipleChoiceOptions
-            options={multipleChoiceOptions}
-            onOptionsChange={(options) => onMultipleChoiceOptionsChange?.(options)}
-          />
-        )}
       </div>
     </div>
   );
