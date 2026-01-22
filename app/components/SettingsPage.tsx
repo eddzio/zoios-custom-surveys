@@ -154,8 +154,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               </div>
 
               {/* Questions list */}
-              <div className="p-6 pt-4">
-                <div className="flex flex-col max-h-[328px] overflow-y-auto custom-scrollbar">
+              <div className="p-6 pt-4 relative">
+                <div className="flex flex-col max-h-[328px] overflow-y-auto custom-scrollbar pb-4">
                   {questions.map((question, index) => (
                     <div key={question.id} className="flex gap-2 py-2">
                       <span
@@ -170,6 +170,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     </div>
                   ))}
                 </div>
+                {/* Gradient fade at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none" />
               </div>
             </div>
 
