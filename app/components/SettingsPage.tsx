@@ -14,6 +14,7 @@ interface SettingsPageProps {
   questions: QuestionItem[];
   recipients: Recipient[];
   collaborators: Collaborator[];
+  surveyTitle: string;
   onEditQuestions: () => void;
   onEditRecipients: () => void;
   onCollaboratorsChange: (collaborators: Collaborator[]) => void;
@@ -49,6 +50,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   questions,
   recipients,
   collaborators,
+  surveyTitle,
   onEditQuestions,
   onEditRecipients,
   onCollaboratorsChange,
@@ -57,6 +59,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 }) => {
   const [minimumResponses, setMinimumResponses] = useState("3");
   const [minimumGroupSize, setMinimumGroupSize] = useState("5");
+  const [surveyDescription, setSurveyDescription] = useState("");
+  const [surveyImage, setSurveyImage] = useState<string | null>(null);
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleMinimumResponsesChange = (value: string) => {
     setMinimumResponses(value);
@@ -65,6 +71,31 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   const handleMinimumGroupSizeChange = (value: string) => {
     setMinimumGroupSize(value);
+    triggerSave();
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setSurveyDescription(value);
+    triggerSave();
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === "image/png") {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSurveyImage(event.target?.result as string);
+        triggerSave();
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSurveyImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     triggerSave();
   };
 
@@ -77,7 +108,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         ...collaborators,
         { id: availablePerson.id, name: availablePerson.name, role: "viewer" as const },
       ]);
-      triggerSave();
+      triggerSave(() => {
+        toast.success(`${availablePerson.name} added as collaborator`);
+      });
     }
   };
 
@@ -239,6 +272,88 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               </div>
             </div>
 
+            {/* Survey Description section */}
+            <div className="p-6 border-t border-[var(--border)]">
+              <div className="mb-4">
+                <h3
+                  className="text-xl font-medium text-black mb-1"
+                  style={{ fontFamily: "Bitter, serif" }}
+                >
+                  Survey description
+                </h3>
+                <p className="text-base text-[var(--label-light)]">
+                  Customize the email that will be sent to recipients
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {/* Description textarea */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-base text-[var(--label-primary)]">
+                    Description
+                  </label>
+                  <textarea
+                    value={surveyDescription}
+                    onChange={(e) => handleDescriptionChange(e.target.value)}
+                    placeholder="Please answer the following survey"
+                    rows={4}
+                    className="px-3 py-2 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20 resize-none"
+                  />
+                  <span className="text-[13px] text-[var(--label-light)] leading-[18px]">
+                    This text will appear in the email sent to recipients
+                  </span>
+                </div>
+
+                {/* Image upload */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-base text-[var(--label-primary)]">
+                    Image (PNG)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="survey-image-upload"
+                    />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0"
+                    >
+                      {surveyImage ? "Change image" : "Upload image"}
+                    </button>
+                    {surveyImage && (
+                      <button
+                        onClick={handleRemoveImage}
+                        className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-negative)] text-base font-medium rounded-lg hover:bg-red-50 whitespace-nowrap shrink-0"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  {surveyImage && (
+                    <div className="mt-2 relative w-fit">
+                      <img
+                        src={surveyImage}
+                        alt="Survey preview"
+                        className="max-w-[200px] max-h-[120px] rounded-lg border border-[var(--border)] object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Preview button */}
+                <button
+                  onClick={() => setShowEmailPreview(true)}
+                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0 self-start"
+                >
+                  Preview email
+                </button>
+              </div>
+            </div>
+
             {/* Collaborator section */}
             <div className="p-6 border-t border-[var(--border)]">
               <div className="mb-4">
@@ -370,6 +485,87 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Email Preview Modal */}
+      {showEmailPreview && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl w-full max-w-[600px] max-h-[90vh] flex flex-col shadow-xl mx-4">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
+              <h2
+                className="text-xl font-medium text-[var(--label-primary)]"
+                style={{ fontFamily: "Bitter, serif" }}
+              >
+                Email preview
+              </h2>
+              <button
+                onClick={() => setShowEmailPreview(false)}
+                className="w-10 h-10 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)] hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M5 5L15 15M15 5L5 15" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content - Email Preview */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {/* Fake email container */}
+              <div className="border border-[var(--border)] rounded-lg overflow-hidden">
+                {/* Email header */}
+                <div className="bg-[var(--bg-neutral)] px-4 py-3 border-b border-[var(--border)]">
+                  <div className="flex items-center gap-2 text-sm text-[var(--label-light)]">
+                    <span className="font-medium text-[var(--label-primary)]">Subject:</span>
+                    <span>{surveyTitle}</span>
+                  </div>
+                </div>
+
+                {/* Email body */}
+                <div className="p-6 bg-white">
+                  <div className="max-w-[400px] mx-auto flex flex-col items-center text-center gap-4">
+                    {/* Survey title */}
+                    <h3
+                      className="text-2xl font-semibold text-[var(--label-primary)]"
+                      style={{ fontFamily: "Bitter, serif" }}
+                    >
+                      {surveyTitle}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-base text-[var(--label-light)]">
+                      {surveyDescription || "Please answer the following survey"}
+                    </p>
+
+                    {/* Image (only if uploaded) */}
+                    {surveyImage && (
+                      <img
+                        src={surveyImage}
+                        alt="Survey"
+                        className="max-w-full rounded-lg"
+                      />
+                    )}
+
+                    {/* Answer survey button */}
+                    <button className="h-10 px-6 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm mt-2">
+                      Answer survey
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end p-6 border-t border-[var(--border)]">
+              <button
+                onClick={() => setShowEmailPreview(false)}
+                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -819,6 +819,7 @@ export default function Home() {
               questions={questions}
               recipients={recipients}
               collaborators={collaborators}
+              surveyTitle={pageTitle}
               onEditQuestions={() => setCurrentStep(1)}
               onEditRecipients={() => setCurrentStep(2)}
               onCollaboratorsChange={setCollaborators}
