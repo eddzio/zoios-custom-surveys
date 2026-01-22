@@ -473,7 +473,25 @@ export default function Home() {
         lastUpdated: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }),
       };
       setSurveys([duplicatedSurvey, ...surveys]);
-      toast.success("Survey duplicated");
+      toast.success("Survey duplicated", {
+        action: {
+          label: "Go to survey list",
+          onClick: () => setCurrentView("list"),
+        },
+        actionButtonStyle: {
+          backgroundColor: "transparent",
+          color: "inherit",
+          fontSize: "inherit",
+          fontWeight: 600,
+          textDecoration: "underline",
+          padding: 0,
+          margin: 0,
+          marginLeft: 4,
+        },
+        classNames: {
+          actionButton: "hover:no-underline",
+        },
+      });
     }
   };
 

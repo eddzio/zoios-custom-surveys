@@ -416,7 +416,7 @@ const YesNoDonutChartContent = ({ data }: { data: { yes: number; no: number } })
           {/* Center text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span
-              className="text-4xl font-semibold text-[var(--label-primary)]"
+              className="text-4xl font-medium text-[var(--label-primary)]"
               style={{ fontFamily: "DM Mono, monospace" }}
             >
               {yesPercentage}%
@@ -474,12 +474,12 @@ const ScaleBarChartContent = ({
             <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" vertical={false} />
             <XAxis
               dataKey="score"
-              tick={{ fontSize: 12, fill: "#79716b" }}
+              tick={{ fontSize: 12, fill: "#79716b", fontFamily: "DM Mono, monospace" }}
               axisLine={{ stroke: "#e7e5e4" }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fontSize: 12, fill: "#79716b" }}
+              tick={{ fontSize: 12, fill: "#79716b", fontFamily: "DM Mono, monospace" }}
               axisLine={false}
               tickLine={false}
             />
@@ -489,6 +489,7 @@ const ScaleBarChartContent = ({
                 border: "1px solid #e7e5e4",
                 borderRadius: "8px",
                 fontSize: "12px",
+                fontFamily: "DM Mono, monospace",
               }}
             />
             <Bar dataKey="count" fill="#292524" radius={[4, 4, 0, 0]} />
@@ -501,6 +502,7 @@ const ScaleBarChartContent = ({
                 position: "right",
                 fontSize: 11,
                 fill: "#f5855c",
+                fontFamily: "DM Mono, monospace",
               }}
             />
           </BarChart>
@@ -570,7 +572,7 @@ const MultipleChoiceBarChartContent = ({ data }: { data: Record<string, number> 
               interval={0}
             />
             <YAxis
-              tick={{ fontSize: 12, fill: "#79716b" }}
+              tick={{ fontSize: 12, fill: "#79716b", fontFamily: "DM Mono, monospace" }}
               axisLine={false}
               tickLine={false}
             />
@@ -580,6 +582,7 @@ const MultipleChoiceBarChartContent = ({ data }: { data: Record<string, number> 
                 border: "1px solid #e7e5e4",
                 borderRadius: "8px",
                 fontSize: "12px",
+                fontFamily: "DM Mono, monospace",
               }}
               formatter={(value) => {
                 const numValue = value as number;
