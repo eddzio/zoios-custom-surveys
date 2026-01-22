@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   PieChart,
   Pie,
@@ -14,7 +14,6 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from "recharts";
-import { ChevronDown } from "react-feather";
 import { QuestionItem } from "./QuestionListSidebar";
 
 interface ResultsPageProps {
@@ -90,171 +89,112 @@ const generateEmployees = (): Employee[] => {
 
 const EMPLOYEES = generateEmployees();
 
-// Filter Dropdown Component
-interface FilterDropdownProps {
-  label: string;
-  options: string[];
-  value: string | null;
-  onChange: (value: string | null) => void;
-  placeholder?: string;
-}
+// Checkbox types and components
+type CheckboxState = "unchecked" | "checked" | "partial";
 
-const FilterDropdown: React.FC<FilterDropdownProps> = ({
-  label,
-  options,
-  value,
-  onChange,
-  placeholder = "All",
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+const CheckboxIcon = ({ state }: { state: CheckboxState }) => {
+  const getCheckboxStyle = () => {
+    if (state === "checked" || state === "partial") {
+      return "bg-[var(--control-primary)] border-[var(--control-primary)]";
+    }
+    return "bg-white border-[var(--border)]";
+  };
 
   return (
-    <div className="flex flex-col gap-1.5" ref={dropdownRef}>
-      <label className="text-xs text-[var(--label-light)]" style={{ fontFamily: "Poppins, sans-serif" }}>
-        {label}
-      </label>
-      <div className="relative">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="h-10 px-3 pr-8 bg-white border border-[var(--border)] rounded-lg text-sm text-left min-w-[160px] hover:bg-gray-50 transition-colors flex items-center justify-between"
-          style={{ fontFamily: "Poppins, sans-serif" }}
-        >
-          <span className={value ? "text-[var(--label-primary)]" : "text-[var(--label-light)]"}>
-            {value || placeholder}
-          </span>
-          <ChevronDown
-            size={16}
-            className={`absolute right-2 text-[var(--label-light)] transition-transform ${isOpen ? "rotate-180" : ""}`}
+    <div
+      className={`w-5 h-5 rounded flex items-center justify-center border-2 shrink-0 ${getCheckboxStyle()}`}
+    >
+      {state === "checked" && (
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+          <path
+            d="M2 7L6 11L12 3"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
-        </button>
-
-        {isOpen && (
-          <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1 max-h-[240px] overflow-y-auto">
-            <button
-              onClick={() => {
-                onChange(null);
-                setIsOpen(false);
-              }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 transition-colors ${
-                !value ? "bg-gray-50 text-[var(--label-primary)]" : "text-[var(--label-light)]"
-              }`}
-              style={{ fontFamily: "Poppins, sans-serif" }}
-            >
-              All
-            </button>
-            {options.map((option) => (
-              <button
-                key={option}
-                onClick={() => {
-                  onChange(option);
-                  setIsOpen(false);
-                }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 transition-colors ${
-                  value === option ? "bg-gray-50 text-[var(--label-primary)]" : "text-[var(--label-primary)]"
-                }`}
-                style={{ fontFamily: "Poppins, sans-serif" }}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        </svg>
+      )}
+      {state === "partial" && (
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+          <path
+            d="M3 7H11"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
     </div>
   );
 };
 
-// Dimension Dropdown Component
-interface DimensionDropdownProps {
-  value: DimensionKey | null;
-  onChange: (value: DimensionKey | null) => void;
-}
-
-const DimensionDropdown: React.FC<DimensionDropdownProps> = ({ value, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const dimensionOptions = Object.entries(DIMENSIONS).map(([key, { label }]) => ({
-    key: key as DimensionKey,
-    label,
-  }));
-
+// Dimension Row Component with checkbox
+const DimensionRow = ({
+  state,
+  label,
+  isSelected,
+  onSelect,
+  onToggle,
+}: {
+  state: CheckboxState;
+  label: string;
+  isSelected: boolean;
+  onSelect: () => void;
+  onToggle: () => void;
+}) => {
   return (
-    <div className="flex flex-col gap-1.5" ref={dropdownRef}>
-      <label className="text-xs text-[var(--label-light)]" style={{ fontFamily: "Poppins, sans-serif" }}>
-        Filter by
-      </label>
-      <div className="relative">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="h-10 px-3 pr-8 bg-white border border-[var(--border)] rounded-lg text-sm text-left min-w-[160px] hover:bg-gray-50 transition-colors flex items-center justify-between"
-          style={{ fontFamily: "Poppins, sans-serif" }}
+    <div
+      className={`flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-50 ${
+        isSelected ? "bg-[#f5f5f4]" : ""
+      }`}
+    >
+      <button onClick={onToggle} className="shrink-0">
+        <CheckboxIcon state={state} />
+      </button>
+      <button
+        onClick={onSelect}
+        className="flex-1 flex items-center gap-3 text-left"
+      >
+        <span className="flex-1 text-base text-[var(--label-primary)]">{label}</span>
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          className={isSelected ? "text-[var(--control-primary)]" : "text-[var(--label-light)]"}
         >
-          <span className={value ? "text-[var(--label-primary)]" : "text-[var(--label-light)]"}>
-            {value ? DIMENSIONS[value].label : "Select dimension"}
-          </span>
-          <ChevronDown
-            size={16}
-            className={`absolute right-2 text-[var(--label-light)] transition-transform ${isOpen ? "rotate-180" : ""}`}
+          <path
+            d="M5 2L10 7L5 12"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
-        </button>
-
-        {isOpen && (
-          <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1">
-            <button
-              onClick={() => {
-                onChange(null);
-                setIsOpen(false);
-              }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 transition-colors ${
-                !value ? "bg-gray-50 text-[var(--label-primary)]" : "text-[var(--label-light)]"
-              }`}
-              style={{ fontFamily: "Poppins, sans-serif" }}
-            >
-              No filter
-            </button>
-            {dimensionOptions.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => {
-                  onChange(key);
-                  setIsOpen(false);
-                }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 transition-colors ${
-                  value === key ? "bg-gray-50 text-[var(--label-primary)]" : "text-[var(--label-primary)]"
-                }`}
-                style={{ fontFamily: "Poppins, sans-serif" }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        </svg>
+      </button>
     </div>
+  );
+};
+
+// Segment Row Component with checkbox
+const SegmentRow = ({
+  label,
+  state,
+  onToggle,
+}: {
+  label: string;
+  state: CheckboxState;
+  onToggle: () => void;
+}) => {
+  return (
+    <button
+      onClick={onToggle}
+      className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-50 text-left"
+    >
+      <CheckboxIcon state={state} />
+      <span className="text-base text-[var(--label-primary)]">{label}</span>
+    </button>
   );
 };
 
@@ -602,22 +542,92 @@ const MultipleChoiceBarChartContent = ({ data }: { data: Record<string, number> 
 
 // Main Results Page Component
 export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
-    const [selectedDimension, setSelectedDimension] = useState<DimensionKey | null>(null);
-  const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
+  const [selectedDimension, setSelectedDimension] = useState<DimensionKey | null>(null);
+  const [selectedSegments, setSelectedSegments] = useState<Set<string>>(new Set());
 
-  // Reset segment when dimension changes
-  const handleDimensionChange = (dimension: DimensionKey | null) => {
-    setSelectedDimension(dimension);
-    setSelectedSegment(null);
+  // Calculate dimension checkbox state
+  const getDimensionState = (dimensionKey: DimensionKey): CheckboxState => {
+    const segments = DIMENSIONS[dimensionKey].segments;
+    const selectedCount = segments.filter((s) => selectedSegments.has(`${dimensionKey}:${s}`)).length;
+
+    if (selectedCount === 0) return "unchecked";
+    if (selectedCount === segments.length) return "checked";
+    return "partial";
   };
 
-  // Filter employees based on selection
+  // Handle dimension checkbox toggle (select all / deselect all)
+  const handleDimensionToggle = (dimensionKey: DimensionKey) => {
+    const state = getDimensionState(dimensionKey);
+    const segments = DIMENSIONS[dimensionKey].segments;
+
+    setSelectedSegments((prev) => {
+      const next = new Set(prev);
+      if (state === "checked" || state === "partial") {
+        // Deselect all segments in this dimension
+        segments.forEach((s) => next.delete(`${dimensionKey}:${s}`));
+      } else {
+        // Select all segments in this dimension
+        segments.forEach((s) => next.add(`${dimensionKey}:${s}`));
+      }
+      return next;
+    });
+  };
+
+  // Handle segment checkbox toggle
+  const handleSegmentToggle = (dimensionKey: DimensionKey, segment: string) => {
+    const key = `${dimensionKey}:${segment}`;
+    setSelectedSegments((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
+  // Handle Select All for current dimension
+  const handleSelectAll = () => {
+    if (!selectedDimension) return;
+
+    const segments = DIMENSIONS[selectedDimension].segments;
+    const allSelected = segments.every((s) => selectedSegments.has(`${selectedDimension}:${s}`));
+
+    setSelectedSegments((prev) => {
+      const next = new Set(prev);
+      if (allSelected) {
+        segments.forEach((s) => next.delete(`${selectedDimension}:${s}`));
+      } else {
+        segments.forEach((s) => next.add(`${selectedDimension}:${s}`));
+      }
+      return next;
+    });
+  };
+
+  // Get Select All state for current dimension
+  const getSelectAllState = (): CheckboxState => {
+    if (!selectedDimension) return "unchecked";
+    return getDimensionState(selectedDimension);
+  };
+
+  // Filter employees based on selected segments
   const filteredEmployees = useMemo(() => {
-    if (!selectedDimension || !selectedSegment) {
+    if (selectedSegments.size === 0) {
       return EMPLOYEES;
     }
-    return EMPLOYEES.filter((emp) => emp[selectedDimension] === selectedSegment);
-  }, [selectedDimension, selectedSegment]);
+
+    return EMPLOYEES.filter((emp) => {
+      // Check if employee matches any selected segment
+      for (const key of selectedSegments) {
+        const [dimension, segment] = key.split(":");
+        if (emp[dimension as DimensionKey] === segment) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }, [selectedSegments]);
 
   // Generate dummy data for all questions (memoized to prevent regeneration)
   const questionResponses = useMemo(() => {
@@ -665,24 +675,63 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
       <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="max-w-[900px] mx-auto space-y-6">
             {/* Filter bar */}
-            <div className="bg-white border border-[var(--border)] rounded-xl p-4">
-              <div className="flex items-end gap-4 flex-wrap">
-                <DimensionDropdown
-                  value={selectedDimension}
-                  onChange={handleDimensionChange}
-                />
-                {selectedDimension && (
-                  <FilterDropdown
-                    label={DIMENSIONS[selectedDimension].label}
-                    options={[...DIMENSIONS[selectedDimension].segments]}
-                    value={selectedSegment}
-                    onChange={setSelectedSegment}
-                    placeholder="All"
-                  />
-                )}
-                <div className="flex-1" />
-                <div className="text-sm text-[var(--label-light)] pb-2" style={{ fontFamily: "Poppins, sans-serif" }}>
+            <div className="bg-white border border-[var(--border)] rounded-xl overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
+                <h3
+                  className="text-base font-medium text-[var(--label-primary)]"
+                  style={{ fontFamily: "Bitter, serif" }}
+                >
+                  Filter results
+                </h3>
+                <div className="text-sm text-[var(--label-light)]" style={{ fontFamily: "Poppins, sans-serif" }}>
                   {filteredEmployees.length} of {EMPLOYEES.length} respondents
+                </div>
+              </div>
+
+              {/* Two-column layout */}
+              <div className="flex">
+                {/* Dimensions column */}
+                <div className="flex-1 p-4 border-r border-[var(--border)]">
+                  <p className="text-sm text-[var(--label-light)] mb-2">Dimensions</p>
+                  <div className="flex flex-col">
+                    {Object.entries(DIMENSIONS).map(([key, { label }]) => (
+                      <DimensionRow
+                        key={key}
+                        state={getDimensionState(key as DimensionKey)}
+                        label={label}
+                        isSelected={selectedDimension === key}
+                        onSelect={() => setSelectedDimension(key as DimensionKey)}
+                        onToggle={() => handleDimensionToggle(key as DimensionKey)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Segments column */}
+                <div className="flex-1 p-4">
+                  <p className="text-sm text-[var(--label-light)] mb-2">Segments</p>
+                  {selectedDimension ? (
+                    <div className="flex flex-col">
+                      <SegmentRow
+                        label="Select all"
+                        state={getSelectAllState()}
+                        onToggle={handleSelectAll}
+                      />
+                      {DIMENSIONS[selectedDimension].segments.map((segment) => (
+                        <SegmentRow
+                          key={segment}
+                          label={segment}
+                          state={selectedSegments.has(`${selectedDimension}:${segment}`) ? "checked" : "unchecked"}
+                          onToggle={() => handleSegmentToggle(selectedDimension, segment)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[var(--label-light)] p-2">
+                      Select a dimension to see segments
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
