@@ -15,10 +15,14 @@ interface StepNavigationProps {
   onBack?: () => void;
   onForward?: () => void;
   onStepClick?: (stepNumber: number) => void;
+  disabledSteps?: number[];
 }
 
-const StepIndicator = ({ label, progress, onClick }: { label: string; progress: StepProgress; onClick?: () => void }) => {
+const StepIndicator = ({ label, progress, onClick, disabled }: { label: string; progress: StepProgress; onClick?: () => void; disabled?: boolean }) => {
   const getTextStyle = () => {
+    if (disabled) {
+      return "text-[var(--label-light)] opacity-50";
+    }
     if (progress === "completed" || progress === "current") {
       return "text-[var(--label-primary)] font-medium";
     }
@@ -29,8 +33,9 @@ const StepIndicator = ({ label, progress, onClick }: { label: string; progress: 
 
   return (
     <button
-      onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors ${isCurrent ? "flex" : "hidden lg:flex"}`}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isCurrent ? "flex" : "hidden lg:flex"} ${disabled ? "cursor-not-allowed opacity-60" : "hover:bg-gray-50"}`}
     >
       {progress === "current" ? (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -39,7 +44,7 @@ const StepIndicator = ({ label, progress, onClick }: { label: string; progress: 
           <circle cx="12" cy="12" r="5" fill="var(--control-primary)" />
         </svg>
       ) : progress === "completed" ? (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={disabled ? "opacity-50" : ""}>
           <circle cx="12" cy="12" r="12" fill="var(--control-primary)" />
           <path d="M7 12L10.5 15.5L17 8.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
@@ -74,17 +79,21 @@ const RoundButton = ({ onClick, rotated = false }: { onClick?: () => void; rotat
   );
 };
 
-export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentStep = 1, onBack, onForward, onStepClick }) => {
+export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentStep = 1, onBack, onForward, onStepClick, disabledSteps = [] }) => {
   const getForwardButtonLabel = () => {
-    if (currentStep === 3) return "Send survey";
+    if (currentStep === 3) return "Save and send";
     return "Continue";
   };
+
+  const allStepsDisabled = disabledSteps.length > 0 && disabledSteps.includes(1) && disabledSteps.includes(2) && disabledSteps.includes(3);
 
   return (
     <div className="w-full bg-white border-b border-[var(--border)] flex items-center justify-between px-6 py-2">
       {/* Back button */}
       <div className="w-[120px]">
-        {currentStep > 1 ? (
+        {allStepsDisabled ? (
+          <div /> // Empty space for viewer-only mode
+        ) : currentStep > 1 ? (
           <button
             onClick={onBack}
             className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap"
@@ -104,13 +113,16 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentSt
             label={step.label}
             progress={step.progress}
             onClick={() => onStepClick?.(index + 1)}
+            disabled={disabledSteps.includes(index + 1)}
           />
         ))}
       </div>
 
       {/* Forward button */}
       <div className="w-[120px] flex justify-end">
-        {currentStep < 4 ? (
+        {allStepsDisabled ? (
+          <div /> // Empty space for viewer-only mode
+        ) : currentStep < 4 ? (
           <button
             onClick={onForward}
             className="h-10 px-4 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity whitespace-nowrap"

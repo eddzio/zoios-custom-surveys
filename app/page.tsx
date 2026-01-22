@@ -10,7 +10,7 @@ import { QuestionDetailPanel } from "./components/QuestionDetailPanel";
 import { RecipientsPage } from "./components/RecipientsPage";
 import { SettingsPage } from "./components/SettingsPage";
 import { ResultsPage } from "./components/ResultsPage";
-import { SurveyListPage, Survey } from "./components/SurveyListPage";
+import { SurveyListPage, Survey, Collaborator } from "./components/SurveyListPage";
 
 // Initial state with pizza-themed questions spanning all types
 const initialQuestions: QuestionItem[] = [
@@ -126,6 +126,10 @@ const initialSurveys: Survey[] = [
     status: "draft",
     lastUpdated: "07 March 2025",
     createdBy: "Christian Højbo Møller",
+    collaborators: [
+      { id: 101, name: "Johnny Pecorino", role: "editor" },
+      { id: 102, name: "Frankie Bobby Boyle", role: "viewer" },
+    ],
   },
   {
     id: 2,
@@ -145,6 +149,33 @@ const initialSurveys: Survey[] = [
     sentDate: "15 January 2026",
     createdBy: "Christian Højbo Møller",
   },
+  // Shared surveys - user is a collaborator
+  {
+    id: 4,
+    name: "Q1 2026 Employee Engagement Survey",
+    questionCount: 12,
+    responseCount: 45,
+    status: "sent",
+    lastUpdated: "10 January 2026",
+    sentDate: "05 January 2026",
+    createdBy: "Christian Højbo Møller",
+    sharedWith: {
+      role: "viewer",
+      sharedBy: "Christian Højbo Møller",
+    },
+  },
+  {
+    id: 5,
+    name: "Remote Work Policy Feedback",
+    questionCount: 8,
+    status: "draft",
+    lastUpdated: "18 January 2026",
+    createdBy: "Christian Højbo Møller",
+    sharedWith: {
+      role: "editor",
+      sharedBy: "Christian Højbo Møller",
+    },
+  },
 ];
 
 export default function Home() {
@@ -159,6 +190,7 @@ export default function Home() {
   const [deleteError, setDeleteError] = useState<number | null>(null);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [movingQuestionId, setMovingQuestionId] = useState<number | null>(null);
+  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
 
   // Page title state
   const [pageTitle, setPageTitle] = useState("Workcation Evaluation 2024 Barcelona");
@@ -167,9 +199,37 @@ export default function Home() {
   const [isTitleHovered, setIsTitleHovered] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
+  // Get current survey and check user's role
+  const currentSurvey = currentSurveyId ? surveys.find((s) => s.id === currentSurveyId) : null;
+  const isViewerOnly = currentSurvey?.sharedWith?.role === "viewer";
+  const isSharedSurvey = !!currentSurvey?.sharedWith;
+
   // Survey menu state
   const [isSurveyMenuOpen, setIsSurveyMenuOpen] = useState(false);
   const surveyMenuRef = useRef<HTMLDivElement>(null);
+
+  // Saving indicator state
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const savedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerSave = (callback?: () => void) => {
+    // Clear any existing timeouts
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
+
+    setSaveStatus("saving");
+
+    saveTimeoutRef.current = setTimeout(() => {
+      setSaveStatus("saved");
+      // Execute callback (like showing toast) after save completes
+      if (callback) callback();
+
+      savedTimeoutRef.current = setTimeout(() => {
+        setSaveStatus("idle");
+      }, 2000);
+    }, 2000);
+  };
 
   // Close survey menu when clicking outside
   useEffect(() => {
@@ -198,7 +258,15 @@ export default function Home() {
 
   const handleSaveTitle = () => {
     if (editedTitle.trim()) {
-      setPageTitle(editedTitle.trim());
+      const newTitle = editedTitle.trim();
+      setPageTitle(newTitle);
+      // Update the survey name in the list
+      if (currentSurveyId) {
+        setSurveys(surveys.map((s) =>
+          s.id === currentSurveyId ? { ...s, name: newTitle } : s
+        ));
+      }
+      triggerSave();
     }
     setIsEditingTitle(false);
   };
@@ -230,15 +298,25 @@ export default function Home() {
   ];
 
   const handleBack = () => {
+    // Viewers can only see Results, no navigation allowed
+    if (isViewerOnly) return;
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
   const handleForward = () => {
+    // Viewers can only see Results, no navigation allowed
+    if (isViewerOnly) return;
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
+  };
+
+  const handleStepClick = (step: number) => {
+    // Viewers can only see Results
+    if (isViewerOnly && step !== 4) return;
+    setCurrentStep(step);
   };
 
   const handleAddQuestion = () => {
@@ -257,6 +335,7 @@ export default function Home() {
     };
     setQuestions([...questions, newQuestion]);
     setSelectedQuestionId(newId);
+    triggerSave();
 
     // Scroll to new question after a brief delay
     setTimeout(() => {
@@ -270,6 +349,7 @@ export default function Home() {
     if (deleteError === id) {
       setDeleteError(null);
     }
+    triggerSave();
   };
 
   const handleQuestionSelect = (id: number) => {
@@ -291,6 +371,7 @@ export default function Home() {
       if (nextQuestion) setSelectedQuestionId(nextQuestion.id);
     }
     setDeleteError(null);
+    triggerSave();
   };
 
   const handleMoveQuestion = (id: number, direction: 'up' | 'down') => {
@@ -303,10 +384,12 @@ export default function Home() {
       const newQuestions = [...questions];
       [newQuestions[index], newQuestions[index - 1]] = [newQuestions[index - 1], newQuestions[index]];
       setQuestions(newQuestions);
+      triggerSave();
     } else if (direction === 'down' && index < questions.length - 1) {
       const newQuestions = [...questions];
       [newQuestions[index], newQuestions[index + 1]] = [newQuestions[index + 1], newQuestions[index]];
       setQuestions(newQuestions);
+      triggerSave();
     }
   };
 
@@ -320,6 +403,7 @@ export default function Home() {
       status: "draft",
       lastUpdated: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }),
       createdBy: "You",
+      collaborators: [],
     };
     setSurveys([newSurvey, ...surveys]);
     setCurrentSurveyId(newId);
@@ -338,6 +422,7 @@ export default function Home() {
     }]);
     setSelectedQuestionId(1);
     setRecipients([]);
+    setCollaborators([]);
     setCurrentStep(1);
     setCurrentView("editor");
   };
@@ -347,7 +432,13 @@ export default function Home() {
     if (survey) {
       setCurrentSurveyId(id);
       setPageTitle(survey.name);
-      setCurrentStep(1); // Go to Questions
+      setCollaborators(survey.collaborators || []);
+      // Viewers can only see Results page
+      if (survey.sharedWith?.role === "viewer") {
+        setCurrentStep(4); // Go directly to Results
+      } else {
+        setCurrentStep(1); // Go to Questions
+      }
       setCurrentView("editor");
     }
   };
@@ -357,7 +448,13 @@ export default function Home() {
     if (survey) {
       setCurrentSurveyId(id);
       setPageTitle(survey.name);
-      setCurrentStep(3); // Go to Settings
+      setCollaborators(survey.collaborators || []);
+      // Viewers can only see Results page
+      if (survey.sharedWith?.role === "viewer") {
+        setCurrentStep(4);
+      } else {
+        setCurrentStep(3); // Go to Settings
+      }
       setCurrentView("editor");
     }
   };
@@ -586,13 +683,35 @@ export default function Home() {
                 )}
               </div>
             </div>
-            {/* Back to surveys button */}
-            <button
-              onClick={handleBackToList}
-              className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Back to surveys
-            </button>
+            {/* Saving indicator and Back to surveys button */}
+            <div className="flex items-center gap-3">
+              {saveStatus !== "idle" && (
+                <div className="flex items-center gap-2">
+                  {saveStatus === "saving" ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 text-[var(--label-light)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="text-sm text-[var(--label-light)]">Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm text-green-600">Changes saved</span>
+                    </>
+                  )}
+                </div>
+              )}
+              <button
+                onClick={handleBackToList}
+                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Back to surveys
+              </button>
+            </div>
           </div>
         </div>
 
@@ -603,7 +722,8 @@ export default function Home() {
               currentStep={currentStep}
               onBack={handleBack}
               onForward={handleForward}
-              onStepClick={setCurrentStep}
+              onStepClick={handleStepClick}
+              disabledSteps={isViewerOnly ? [1, 2, 3] : []}
             />
           </div>
 
@@ -698,8 +818,17 @@ export default function Home() {
             <SettingsPage
               questions={questions}
               recipients={recipients}
+              collaborators={collaborators}
               onEditQuestions={() => setCurrentStep(1)}
               onEditRecipients={() => setCurrentStep(2)}
+              onCollaboratorsChange={setCollaborators}
+              onDeleteSurvey={() => {
+                if (currentSurveyId) {
+                  handleDeleteSurvey(currentSurveyId);
+                  handleBackToList();
+                }
+              }}
+              triggerSave={triggerSave}
             />
           )}
 

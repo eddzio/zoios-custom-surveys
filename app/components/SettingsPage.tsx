@@ -1,7 +1,9 @@
 "use client"
 
 import React, { useState } from "react";
+import { toast } from "sonner";
 import { QuestionItem } from "./QuestionListSidebar";
+import { Collaborator } from "./SurveyListPage";
 
 interface Recipient {
   id: number;
@@ -11,8 +13,12 @@ interface Recipient {
 interface SettingsPageProps {
   questions: QuestionItem[];
   recipients: Recipient[];
+  collaborators: Collaborator[];
   onEditQuestions: () => void;
   onEditRecipients: () => void;
+  onCollaboratorsChange: (collaborators: Collaborator[]) => void;
+  onDeleteSurvey: () => void;
+  triggerSave: (callback?: () => void) => void;
 }
 
 const Tag = ({ label }: { label: string }) => {
@@ -30,15 +36,79 @@ const Tag = ({ label }: { label: string }) => {
   );
 };
 
+// Available people to add as collaborators
+const availablePeople = [
+  { id: 101, name: "Johnny Pecorino" },
+  { id: 102, name: "Frankie Bobby Boyle" },
+  { id: 103, name: "Anna Schmidt" },
+  { id: 104, name: "Marcus Chen" },
+  { id: 105, name: "Sofia Rodriguez" },
+];
+
 export const SettingsPage: React.FC<SettingsPageProps> = ({
   questions,
   recipients,
+  collaborators,
   onEditQuestions,
   onEditRecipients,
+  onCollaboratorsChange,
+  onDeleteSurvey,
+  triggerSave,
 }) => {
   const [minimumResponses, setMinimumResponses] = useState("3");
   const [minimumGroupSize, setMinimumGroupSize] = useState("5");
-  const [selectedCollaborator, setSelectedCollaborator] = useState("");
+
+  const handleMinimumResponsesChange = (value: string) => {
+    setMinimumResponses(value);
+    triggerSave();
+  };
+
+  const handleMinimumGroupSizeChange = (value: string) => {
+    setMinimumGroupSize(value);
+    triggerSave();
+  };
+
+  const handleAddCollaborator = () => {
+    // Find first person not already a collaborator
+    const existingIds = collaborators.map((c) => c.id);
+    const availablePerson = availablePeople.find((p) => !existingIds.includes(p.id));
+    if (availablePerson) {
+      onCollaboratorsChange([
+        ...collaborators,
+        { id: availablePerson.id, name: availablePerson.name, role: "viewer" as const },
+      ]);
+      triggerSave();
+    }
+  };
+
+  const handleRemoveCollaborator = (id: number) => {
+    const collaborator = collaborators.find((c) => c.id === id);
+    onCollaboratorsChange(collaborators.filter((c) => c.id !== id));
+    if (collaborator) {
+      triggerSave(() => {
+        toast.success(`${collaborator.name} removed`);
+      });
+    }
+  };
+
+  const handleChangeCollaboratorRole = (id: number, role: "editor" | "viewer") => {
+    onCollaboratorsChange(
+      collaborators.map((c) => (c.id === id ? { ...c, role } : c))
+    );
+    triggerSave();
+  };
+
+  const handleChangeCollaboratorPerson = (oldId: number, newId: number) => {
+    const person = availablePeople.find((p) => p.id === newId);
+    if (person) {
+      onCollaboratorsChange(
+        collaborators.map((c) =>
+          c.id === oldId ? { ...c, id: person.id, name: person.name } : c
+        )
+      );
+      triggerSave();
+    }
+  };
 
   return (
     <div className="flex-1 flex overflow-hidden bg-[var(--bg-neutral)]">
@@ -141,7 +211,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   <input
                     type="text"
                     value={minimumResponses}
-                    onChange={(e) => setMinimumResponses(e.target.value)}
+                    onChange={(e) => handleMinimumResponsesChange(e.target.value)}
                     className="h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
                     style={{ fontFamily: "DM Mono, monospace" }}
                   />
@@ -158,7 +228,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   <input
                     type="text"
                     value={minimumGroupSize}
-                    onChange={(e) => setMinimumGroupSize(e.target.value)}
+                    onChange={(e) => handleMinimumGroupSizeChange(e.target.value)}
                     className="h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
                     style={{ fontFamily: "DM Mono, monospace" }}
                   />
@@ -179,27 +249,99 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   Collaborator
                 </h3>
                 <p className="text-base text-[var(--label-light)]">
-                  Let a colleague make changes to this survey
+                  Lets colleagues make changes to this survey. Editors can change the questions and recipients. Viewers can only see the results.
                 </p>
               </div>
 
-              <div className="relative">
-                <select
-                  value={selectedCollaborator}
-                  onChange={(e) => setSelectedCollaborator(e.target.value)}
-                  className="w-full h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20 appearance-none cursor-pointer"
-                >
-                  <option value="">Select colleague</option>
-                  <option value="anna">Anna</option>
-                  <option value="marcus">Marcus</option>
-                  <option value="sofia">Sofia</option>
-                </select>
-                {/* Dropdown chevron */}
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--label-light)" strokeWidth="1.5">
-                    <path d="M4 5.5L7 8.5L10 5.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
+              {/* Collaborator list */}
+              <div className="flex flex-col gap-3">
+                {collaborators.map((collaborator) => {
+                  const existingIds = collaborators.filter((c) => c.id !== collaborator.id).map((c) => c.id);
+                  const availableForSelect = availablePeople.filter(
+                    (p) => p.id === collaborator.id || !existingIds.includes(p.id)
+                  );
+
+                  return (
+                    <div key={collaborator.id} className="flex items-end gap-3">
+                      {/* Person select */}
+                      <div className="flex-1 flex flex-col gap-1">
+                        <label className="text-base text-[var(--label-primary)]">
+                          Person
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={collaborator.id}
+                            onChange={(e) =>
+                              handleChangeCollaboratorPerson(
+                                collaborator.id,
+                                Number(e.target.value)
+                              )
+                            }
+                            className="w-full h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20 appearance-none cursor-pointer"
+                          >
+                            {availableForSelect.map((person) => (
+                              <option key={person.id} value={person.id}>
+                                {person.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--label-light)" strokeWidth="1.5">
+                              <path d="M4 5.5L7 8.5L10 5.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Role select */}
+                      <div className="w-[140px] flex flex-col gap-1">
+                        <label className="text-base text-[var(--label-primary)]">
+                          Role
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={collaborator.role}
+                            onChange={(e) =>
+                              handleChangeCollaboratorRole(
+                                collaborator.id,
+                                e.target.value as "editor" | "viewer"
+                              )
+                            }
+                            className="w-full h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20 appearance-none cursor-pointer"
+                          >
+                            <option value="editor">Editor</option>
+                            <option value="viewer">Viewer</option>
+                          </select>
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--label-light)" strokeWidth="1.5">
+                              <path d="M4 5.5L7 8.5L10 5.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Delete button */}
+                      <button
+                        onClick={() => handleRemoveCollaborator(collaborator.id)}
+                        className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border-negative)] text-[var(--label-negative)] rounded-full hover:bg-red-50 transition-colors"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M3 7H11" strokeLinecap="round" />
+                        </svg>
+                      </button>
+                    </div>
+                  );
+                })}
+
+                {/* Add collaborator button */}
+                {collaborators.length < availablePeople.length && (
+                  <button
+                    onClick={handleAddCollaborator}
+                    className="text-base text-[var(--label-primary)] font-medium hover:text-[var(--control-primary)] transition-colors self-start mt-1"
+                  >
+                    + Add collaborator
+                  </button>
+                )}
               </div>
             </div>
 
@@ -218,7 +360,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </p>
               </div>
 
-              <button className="h-10 px-4 bg-white border border-[var(--border-negative)] text-[var(--label-negative)] text-base font-medium rounded-lg hover:bg-red-50 shadow-sm">
+              <button
+                onClick={onDeleteSurvey}
+                className="h-10 px-4 bg-white border border-[var(--border-negative)] text-[var(--label-negative)] text-base font-medium rounded-lg hover:bg-red-50 shadow-sm"
+              >
                 Delete survey
               </button>
             </div>

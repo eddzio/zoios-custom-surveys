@@ -3,6 +3,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MoreVertical } from "react-feather";
 
+export interface Collaborator {
+  id: number;
+  name: string;
+  role: "editor" | "viewer";
+}
+
 export interface Survey {
   id: number;
   name: string;
@@ -12,6 +18,12 @@ export interface Survey {
   lastUpdated: string;
   sentDate?: string;
   createdBy: string;
+  collaborators?: Collaborator[];
+  // For surveys shared with the current user
+  sharedWith?: {
+    role: "editor" | "viewer";
+    sharedBy: string;
+  };
 }
 
 interface SurveyListPageProps {
@@ -150,7 +162,10 @@ const SurveyRow = ({
           className="text-[13px] text-[var(--label-primary)]"
           style={{ fontFamily: 'Poppins, sans-serif' }}
         >
-          Created by {survey.createdBy}
+          {survey.sharedWith
+            ? `Shared by ${survey.sharedWith.sharedBy} · ${survey.sharedWith.role === "editor" ? "You're an editor" : "You're a viewer"}`
+            : `Created by ${survey.createdBy}`
+          }
         </p>
       </div>
 
