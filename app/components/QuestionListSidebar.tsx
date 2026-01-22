@@ -23,6 +23,7 @@ interface QuestionListSidebarProps {
   selectedQuestionId?: number;
   onQuestionSelect?: (id: number) => void;
   onAddQuestion?: () => void;
+  onMoveQuestion?: (id: number, direction: "up" | "down") => void;
 }
 
 const QuestionRow = ({
