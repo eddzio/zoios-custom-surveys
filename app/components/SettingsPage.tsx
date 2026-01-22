@@ -60,9 +60,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [minimumResponses, setMinimumResponses] = useState("3");
   const [minimumGroupSize, setMinimumGroupSize] = useState("5");
   const [surveyDescription, setSurveyDescription] = useState("");
-  const [surveyImage, setSurveyImage] = useState<string | null>(null);
   const [showEmailPreview, setShowEmailPreview] = useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleMinimumResponsesChange = (value: string) => {
     setMinimumResponses(value);
@@ -76,26 +74,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   const handleDescriptionChange = (value: string) => {
     setSurveyDescription(value);
-    triggerSave();
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === "image/png") {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setSurveyImage(event.target?.result as string);
-        triggerSave();
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setSurveyImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
     triggerSave();
   };
 
@@ -302,47 +280,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   <span className="text-[13px] text-[var(--label-light)] leading-[18px]">
                     This text will appear in the email sent to recipients
                   </span>
-                </div>
-
-                {/* Image upload */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-base text-[var(--label-primary)]">
-                    Image (PNG)
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/png"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      id="survey-image-upload"
-                    />
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0"
-                    >
-                      {surveyImage ? "Change image" : "Upload image"}
-                    </button>
-                    {surveyImage && (
-                      <button
-                        onClick={handleRemoveImage}
-                        className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-negative)] text-base font-medium rounded-lg hover:bg-red-50 whitespace-nowrap shrink-0"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                  {surveyImage && (
-                    <div className="mt-2 relative w-fit">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={surveyImage}
-                        alt="Survey preview"
-                        className="max-w-[200px] max-h-[120px] rounded-lg border border-[var(--border)] object-cover"
-                      />
-                    </div>
-                  )}
                 </div>
 
                 {/* Preview button */}
@@ -613,6 +550,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 <div className="bg-[#fffaf6]">
                   <div className="p-8">
                     <div className="max-w-[440px] mx-auto flex flex-col items-center text-center gap-5">
+                      {/* Company Logo */}
+                      <svg width="48" height="48" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 226.471C50 218.89 56.268 212.745 64 212.745H236C243.732 212.745 250 218.89 250 226.471V236.275C250 243.855 243.732 250 236 250H64C56.268 250 50 243.855 50 236.275V226.471Z" fill="#E35151"/>
+                        <path d="M50.0026 63.7255C50.0026 56.1451 56.2707 50 64.0026 50H74.0026C81.7346 50 88.0026 56.1451 88.0026 63.7255V232.353C88.0026 239.933 81.7346 246.078 74.0026 246.078H64.0026C56.2707 246.078 50.0026 239.933 50.0026 232.353V63.7255Z" fill="#E35151"/>
+                        <path d="M150.014 73.1437C154.337 66.8592 163.039 65.201 169.449 69.4399L177.739 74.9222C184.149 79.1611 185.841 87.6919 181.517 93.9763L85.336 233.775C81.0124 240.059 72.3109 241.717 65.9008 237.479L57.6104 231.996C51.2003 227.757 49.5089 219.227 53.8326 212.942L150.014 73.1437Z" fill="#E35151"/>
+                        <path d="M217.177 136.409C224.127 133.086 232.508 135.915 235.898 142.729L240.281 151.54C243.671 158.353 240.785 166.57 233.835 169.894L79.2429 243.815C72.2934 247.138 63.912 244.309 60.5226 237.495L56.1388 228.684C52.7494 221.87 55.6353 213.653 62.5848 210.33L217.177 136.409Z" fill="#E35151"/>
+                      </svg>
+
                       {/* Survey title */}
                       <h3
                         className="text-2xl font-semibold text-[var(--label-primary)]"
@@ -625,16 +570,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       <p className="text-base text-[var(--label-light)] leading-relaxed">
                         {surveyDescription || "Please answer the following survey"}
                       </p>
-
-                      {/* Image (only if uploaded) */}
-                      {surveyImage && (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={surveyImage}
-                          alt="Survey"
-                          className="max-w-full rounded-lg"
-                        />
-                      )}
 
                       {/* Answer survey button */}
                       <button className="h-11 px-8 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm mt-2 hover:opacity-90 transition-opacity">
