@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle } from "react-feather";
+import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle, MoreVertical } from "react-feather";
+import { toast } from "sonner";
 import { StepNavigation } from "./components/StepNavigation";
 import { QuestionListSidebar, QuestionItem } from "./components/QuestionListSidebar";
 import { QuestionDetailPanel } from "./components/QuestionDetailPanel";
@@ -166,24 +167,33 @@ export default function Home() {
   const [isTitleHovered, setIsTitleHovered] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    const input = titleInputRef.current;
+  // Survey menu state
+  const [isSurveyMenuOpen, setIsSurveyMenuOpen] = useState(false);
+  const surveyMenuRef = useRef<HTMLDivElement>(null);
 
-    if (input) {
-      // Temporarily set the value to measure
-      const prevValue = input.value;
-      input.value = newValue;
-
-      // Check if text overflows
-      if (input.scrollWidth > input.clientWidth) {
-        // Revert to previous value if it overflows
-        input.value = prevValue;
-        return;
+  // Close survey menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (surveyMenuRef.current && !surveyMenuRef.current.contains(event.target as Node)) {
+        setIsSurveyMenuOpen(false);
       }
+    };
+
+    if (isSurveyMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
-    setEditedTitle(newValue);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isSurveyMenuOpen]);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    // Limit to 50 characters to stay within max width
+    if (newValue.length <= 50) {
+      setEditedTitle(newValue);
+    }
   };
 
   const handleSaveTitle = () => {
@@ -366,11 +376,13 @@ export default function Home() {
         lastUpdated: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }),
       };
       setSurveys([duplicatedSurvey, ...surveys]);
+      toast.success("Survey duplicated");
     }
   };
 
   const handleDeleteSurvey = (id: number) => {
     setSurveys(surveys.filter((s) => s.id !== id));
+    toast.success("Survey deleted");
   };
 
   const handleBackToList = () => {
@@ -378,10 +390,32 @@ export default function Home() {
     setCurrentSurveyId(null);
   };
 
+  // Survey menu handlers
+  const handleRenameFromMenu = () => {
+    setIsSurveyMenuOpen(false);
+    setIsEditingTitle(true);
+    setEditedTitle(pageTitle);
+  };
+
+  const handleDuplicateFromMenu = () => {
+    setIsSurveyMenuOpen(false);
+    if (currentSurveyId) {
+      handleDuplicateSurvey(currentSurveyId);
+    }
+  };
+
+  const handleDeleteFromMenu = () => {
+    setIsSurveyMenuOpen(false);
+    if (currentSurveyId) {
+      handleDeleteSurvey(currentSurveyId);
+      handleBackToList();
+    }
+  };
+
   return (
     <div className="h-screen bg-[#fffaf6] overflow-hidden relative">
       {/* Navbar - floating on left */}
-      <div className="fixed left-4 top-[68px] bottom-4 w-[68px] bg-white border border-[var(--border)] rounded-2xl flex flex-col items-center py-4 z-10">
+      <div className="fixed left-4 top-4 bottom-4 w-[68px] bg-white border border-[var(--border)] rounded-2xl flex flex-col items-center py-4 z-10">
         {/* Logo placeholder */}
         <div className="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center mb-6">
           <span className="text-white font-bold text-lg">C</span>
@@ -428,80 +462,137 @@ export default function Home() {
             <>
           {/* Page header */}
           <div className="border-b border-[var(--border)]">
-          <div className="flex flex-col px-6 py-6">
-            {/* Breadcrumbs */}
-            <div className="flex items-center mb-1 pl-2">
-              <button
-                onClick={handleBackToList}
-                className="text-base text-[var(--label-light)] font-medium hover:text-[var(--label-primary)] transition-colors"
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              >
-                Custom surveys
-              </button>
-              <div className="w-10 h-10 flex items-center justify-center">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M5 2L10 7L5 12" stroke="var(--label-light)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+          <div className="flex items-start justify-between px-6 py-6">
+            <div className="flex flex-col">
+              {/* Breadcrumbs */}
+              <div className="flex items-center mb-1 pl-2">
+                <button
+                  onClick={handleBackToList}
+                  className="text-base text-[var(--label-light)] font-medium hover:text-[var(--label-primary)] transition-colors"
+                  style={{ fontFamily: 'Poppins, sans-serif' }}
+                >
+                  Custom surveys
+                </button>
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M5 2L10 7L5 12" stroke="var(--label-light)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
               </div>
-            </div>
-            {/* Page Title */}
-            <div className="flex items-center gap-3">
-              <div
-                className="w-[600px]"
-                onMouseEnter={() => setIsTitleHovered(true)}
-                onMouseLeave={() => setIsTitleHovered(false)}
-              >
-                {isEditingTitle ? (
-                  <input
-                    ref={titleInputRef}
-                    type="text"
-                    value={editedTitle}
-                    onChange={handleTitleChange}
-                    onKeyDown={handleTitleKeyDown}
-                    autoFocus
-                    className="w-full text-2xl font-semibold text-[var(--label-primary)] bg-gray-100 px-2 py-1 rounded-lg outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+              {/* Page Title */}
+              <div className="flex items-center gap-1">
+                <div
+                  className="max-w-[600px] relative"
+                  onMouseEnter={() => setIsTitleHovered(true)}
+                  onMouseLeave={() => setIsTitleHovered(false)}
+                >
+                  {/* Hidden span to measure text width */}
+                  <span
+                    className="invisible absolute whitespace-pre text-2xl font-semibold px-2"
                     style={{
                       fontFamily: 'Bitter, serif',
                       letterSpacing: '-0.48px',
-                      lineHeight: '36px'
                     }}
-                  />
-                ) : (
-                  <h1
-                    onClick={() => {
-                      setIsEditingTitle(true);
-                      setEditedTitle(pageTitle);
-                    }}
-                    className={`text-2xl font-semibold text-[var(--label-primary)] px-2 py-1 rounded-lg transition-colors truncate ${
-                      isTitleHovered ? 'bg-gray-100 cursor-text' : ''
-                    }`}
-                    style={{
-                      fontFamily: 'Bitter, serif',
-                      letterSpacing: '-0.48px',
-                      lineHeight: '36px'
-                    }}
+                    aria-hidden="true"
                   >
-                    {pageTitle}
-                  </h1>
+                    {isEditingTitle ? editedTitle || ' ' : pageTitle || ' '}
+                  </span>
+                  {isEditingTitle ? (
+                    <input
+                      ref={titleInputRef}
+                      type="text"
+                      value={editedTitle}
+                      onChange={handleTitleChange}
+                      onKeyDown={handleTitleKeyDown}
+                      autoFocus
+                      className="text-2xl font-semibold text-[var(--label-primary)] bg-gray-100 px-2 py-1 rounded-lg outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+                      style={{
+                        fontFamily: 'Bitter, serif',
+                        letterSpacing: '-0.48px',
+                        lineHeight: '36px',
+                        width: `calc(${Math.min(Math.max((editedTitle || ' ').length, 1), 50)}ch + 20px)`,
+                        maxWidth: '600px',
+                        minWidth: '100px',
+                      }}
+                    />
+                  ) : (
+                    <h1
+                      onClick={() => {
+                        setIsEditingTitle(true);
+                        setEditedTitle(pageTitle);
+                      }}
+                      className={`text-2xl font-semibold text-[var(--label-primary)] px-2 py-1 rounded-lg transition-colors whitespace-nowrap ${
+                        isTitleHovered ? 'bg-gray-100 cursor-text' : ''
+                      }`}
+                      style={{
+                        fontFamily: 'Bitter, serif',
+                        letterSpacing: '-0.48px',
+                        lineHeight: '36px',
+                        maxWidth: '600px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {pageTitle}
+                    </h1>
+                  )}
+                </div>
+                {/* Survey menu */}
+                <div className="relative" ref={surveyMenuRef}>
+                  <button
+                    onClick={() => setIsSurveyMenuOpen(!isSurveyMenuOpen)}
+                    className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--label-light)] hover:bg-gray-100 hover:text-[var(--label-primary)] transition-colors"
+                  >
+                    <MoreVertical size={20} />
+                  </button>
+                  {isSurveyMenuOpen && (
+                    <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1 z-20">
+                      <button
+                        onClick={handleRenameFromMenu}
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-50 transition-colors"
+                      >
+                        Rename
+                      </button>
+                      <button
+                        onClick={handleDuplicateFromMenu}
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-50 transition-colors"
+                      >
+                        Duplicate survey
+                      </button>
+                      <button
+                        onClick={handleDeleteFromMenu}
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-negative)] hover:bg-gray-50 transition-colors"
+                      >
+                        Delete survey
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {isEditingTitle && editedTitle !== pageTitle && (
+                  <div className="flex items-center gap-2 ml-2">
+                    <button
+                      onClick={handleSaveTitle}
+                      className="h-10 px-4 bg-[var(--control-primary)] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancelTitle}
+                      className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 )}
               </div>
-              {isEditingTitle && editedTitle !== pageTitle && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleSaveTitle}
-                    className="h-8 px-3 bg-[var(--control-primary)] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={handleCancelTitle}
-                    className="h-8 px-3 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
             </div>
+            {/* Back to surveys button */}
+            <button
+              onClick={handleBackToList}
+              className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Back to surveys
+            </button>
           </div>
         </div>
 
