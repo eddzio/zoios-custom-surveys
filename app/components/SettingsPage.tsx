@@ -490,7 +490,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       {/* Email Preview Modal */}
       {showEmailPreview && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl w-full max-w-[600px] max-h-[90vh] flex flex-col shadow-xl mx-4">
+          <div className="bg-white rounded-2xl w-full max-w-[750px] max-h-[90vh] flex flex-col shadow-xl mx-4">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
               <h2
@@ -509,48 +509,138 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               </button>
             </div>
 
-            {/* Modal Content - Email Preview */}
+            {/* Modal Content - Apple Mail Mockup */}
             <div className="flex-1 overflow-y-auto p-6">
-              {/* Fake email container */}
-              <div className="border border-[var(--border)] rounded-lg overflow-hidden">
-                {/* Email header */}
-                <div className="bg-[var(--bg-neutral)] px-4 py-3 border-b border-[var(--border)]">
-                  <div className="flex items-center gap-2 text-sm text-[var(--label-light)]">
-                    <span className="font-medium text-[var(--label-primary)]">Subject:</span>
-                    <span>{surveyTitle}</span>
+              <div className="bg-[#f5f5f5] rounded-xl flex flex-col shadow-lg overflow-hidden border border-[var(--border)]">
+                {/* macOS Window Title Bar */}
+                <div className="bg-gradient-to-b from-[#e8e8e8] to-[#d8d8d8] px-4 py-2.5 flex items-center border-b border-[#c0c0c0]">
+                  {/* Traffic light buttons */}
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e2463e]" />
+                    <div className="w-3 h-3 rounded-full bg-[#febc2e] border border-[#dea123]" />
+                    <div className="w-3 h-3 rounded-full bg-[#28c840] border border-[#1eab2f]" />
+                  </div>
+                  {/* Window title */}
+                  <div className="flex-1 text-center">
+                    <span className="text-[13px] font-medium text-[#4d4d4d]">{surveyTitle}</span>
+                  </div>
+                  {/* Spacer to balance traffic lights */}
+                  <div className="w-[52px]" />
+                </div>
+
+                {/* Apple Mail Toolbar */}
+                <div className="bg-gradient-to-b from-[#f8f8f8] to-[#ececec] px-3 py-1.5 flex items-center gap-1 border-b border-[#d1d1d1]">
+                  {/* Reply button */}
+                  <div className="p-1.5 rounded">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M8 4L3 9L8 14" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 9H12C14.7614 9 17 11.2386 17 14V16" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  {/* Reply All button */}
+                  <div className="p-1.5 rounded">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M8 4L3 9L8 14" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M11 4L6 9L11 14" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M6 9H12C14.2091 9 16 10.7909 16 13V16" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  {/* Forward button */}
+                  <div className="p-1.5 rounded">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M12 4L17 9L12 14" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M17 9H8C5.23858 9 3 11.2386 3 14V16" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div className="w-px h-5 bg-[#d1d1d1] mx-1" />
+                  {/* Archive button */}
+                  <div className="p-1.5 rounded">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <rect x="3" y="4" width="14" height="4" rx="1" stroke="#666" strokeWidth="1.5"/>
+                      <path d="M4 8V15C4 15.5523 4.44772 16 5 16H15C15.5523 16 16 15.5523 16 15V8" stroke="#666" strokeWidth="1.5"/>
+                      <path d="M8 11H12" stroke="#666" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  {/* Delete button */}
+                  <div className="p-1.5 rounded">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M5 6H15M8 6V4H12V6M6 6V16H14V6" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div className="flex-1" />
+                  {/* Flag button */}
+                  <div className="p-1.5 rounded">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M4 4V17M4 4L15 7L4 11" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
                 </div>
 
-                {/* Email body */}
-                <div className="p-6 bg-white">
-                  <div className="max-w-[400px] mx-auto flex flex-col items-center text-center gap-4">
-                    {/* Survey title */}
-                    <h3
-                      className="text-2xl font-semibold text-[var(--label-primary)]"
-                      style={{ fontFamily: "Bitter, serif" }}
-                    >
-                      {surveyTitle}
-                    </h3>
+                {/* Email Header Section */}
+                <div className="bg-white px-5 py-4 border-b border-[#e5e5e5]">
+                  {/* From */}
+                  <div className="flex items-start gap-3 mb-2">
+                    <span className="text-[13px] text-[#888] w-14 text-right shrink-0 pt-0.5">From:</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-[var(--brand-primary)] flex items-center justify-center">
+                        <span className="text-white text-xs font-medium">Z</span>
+                      </div>
+                      <span className="text-[13px] text-[#333]">Zoios &lt;surveys@zoios.io&gt;</span>
+                    </div>
+                  </div>
+                  {/* Subject */}
+                  <div className="flex items-start gap-3 mb-2">
+                    <span className="text-[13px] text-[#888] w-14 text-right shrink-0">Subject:</span>
+                    <span className="text-[13px] text-[#333] font-medium">{surveyTitle}</span>
+                  </div>
+                  {/* Date */}
+                  <div className="flex items-start gap-3">
+                    <span className="text-[13px] text-[#888] w-14 text-right shrink-0">Date:</span>
+                    <span className="text-[13px] text-[#888]">
+                      {new Date().toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                </div>
 
-                    {/* Description */}
-                    <p className="text-base text-[var(--label-light)]">
-                      {surveyDescription || "Please answer the following survey"}
-                    </p>
+                {/* Email Body */}
+                <div className="bg-[#fffaf6]">
+                  <div className="p-8">
+                    <div className="max-w-[440px] mx-auto flex flex-col items-center text-center gap-5">
+                      {/* Survey title */}
+                      <h3
+                        className="text-2xl font-semibold text-[var(--label-primary)]"
+                        style={{ fontFamily: "Bitter, serif" }}
+                      >
+                        {surveyTitle}
+                      </h3>
 
-                    {/* Image (only if uploaded) */}
-                    {surveyImage && (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={surveyImage}
-                        alt="Survey"
-                        className="max-w-full rounded-lg"
-                      />
-                    )}
+                      {/* Description */}
+                      <p className="text-base text-[var(--label-light)] leading-relaxed">
+                        {surveyDescription || "Please answer the following survey"}
+                      </p>
 
-                    {/* Answer survey button */}
-                    <button className="h-10 px-6 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm mt-2">
-                      Answer survey
-                    </button>
+                      {/* Image (only if uploaded) */}
+                      {surveyImage && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={surveyImage}
+                          alt="Survey"
+                          className="max-w-full rounded-lg"
+                        />
+                      )}
+
+                      {/* Answer survey button */}
+                      <button className="h-11 px-8 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm mt-2 hover:opacity-90 transition-opacity">
+                        Answer survey
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
