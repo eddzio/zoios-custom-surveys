@@ -733,17 +733,18 @@ export default function Home() {
           </div>
         </div>
 
-          {/* Step navigation */}
-          <div className="flex items-center justify-center">
-            <StepNavigation
-              steps={steps}
-              currentStep={currentStep}
-              onBack={handleBack}
-              onForward={handleForward}
-              onStepClick={handleStepClick}
-              disabledSteps={isViewerOnly ? [1, 2, 3] : []}
-            />
-          </div>
+          {/* Step navigation - hidden for viewers */}
+          {!isViewerOnly && (
+            <div className="flex items-center justify-center">
+              <StepNavigation
+                steps={steps}
+                currentStep={currentStep}
+                onBack={handleBack}
+                onForward={handleForward}
+                onStepClick={handleStepClick}
+              />
+            </div>
+          )}
 
           {/* Main content area */}
           <div className="flex-1 flex overflow-hidden">
