@@ -203,7 +203,7 @@ export const SurveyListPage: React.FC<SurveyListPageProps> = ({
         </h1>
         <button
           onClick={onCreateSurvey}
-          className="h-10 px-4 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+          className="h-10 px-4 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
           style={{ fontFamily: 'Poppins, sans-serif' }}
         >
           Create survey

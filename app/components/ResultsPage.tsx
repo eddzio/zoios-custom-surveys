@@ -663,7 +663,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
       <div className="flex items-center justify-center py-6">
         <button
           onClick={() => setShowData(!showData)}
-          className={`h-10 px-6 text-base font-medium rounded-lg shadow-sm transition-colors ${
+          className={`h-10 px-6 text-base font-medium rounded-lg shadow-sm transition-colors whitespace-nowrap shrink-0 ${
             showData
               ? "bg-[var(--control-primary)] text-white hover:opacity-90"
               : "bg-white border border-[var(--border)] text-[var(--label-primary)] hover:bg-gray-50"

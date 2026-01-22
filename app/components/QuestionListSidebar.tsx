@@ -85,7 +85,7 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
           </h2>
           <button
             onClick={onAddQuestion}
-            className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+            className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] rounded-lg shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0"
           >
             <span className="label-button">Add question</span>
           </button>

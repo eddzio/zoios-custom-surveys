@@ -129,7 +129,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </h3>
                 <button
                   onClick={onEditQuestions}
-                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50"
+                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0"
                 >
                   Edit
                 </button>
@@ -167,7 +167,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </h3>
                 <button
                   onClick={onEditRecipients}
-                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50"
+                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0"
                 >
                   Edit
                 </button>
@@ -362,7 +362,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
               <button
                 onClick={onDeleteSurvey}
-                className="h-10 px-4 bg-white border border-[var(--border-negative)] text-[var(--label-negative)] text-base font-medium rounded-lg hover:bg-red-50 shadow-sm"
+                className="h-10 px-4 bg-white border border-[var(--border-negative)] text-[var(--label-negative)] text-base font-medium rounded-lg hover:bg-red-50 shadow-sm whitespace-nowrap shrink-0"
               >
                 Delete survey
               </button>
