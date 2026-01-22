@@ -335,6 +335,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   </div>
                   {surveyImage && (
                     <div className="mt-2 relative w-fit">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={surveyImage}
                         alt="Survey preview"
@@ -538,6 +539,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
                     {/* Image (only if uploaded) */}
                     {surveyImage && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={surveyImage}
                         alt="Survey"

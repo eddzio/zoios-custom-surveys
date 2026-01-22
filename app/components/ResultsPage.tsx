@@ -599,8 +599,7 @@ const MultipleChoiceBarChartContent = ({ data }: { data: Record<string, number> 
 
 // Main Results Page Component
 export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
-  const [showData, setShowData] = useState(false);
-  const [selectedDimension, setSelectedDimension] = useState<DimensionKey | null>(null);
+    const [selectedDimension, setSelectedDimension] = useState<DimensionKey | null>(null);
   const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
 
   // Reset segment when dimension changes
@@ -659,23 +658,8 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-neutral)]">
-      {/* Header with Show Data button */}
-      <div className="flex items-center justify-center py-6">
-        <button
-          onClick={() => setShowData(!showData)}
-          className={`h-10 px-6 text-base font-medium rounded-lg shadow-sm transition-colors whitespace-nowrap shrink-0 ${
-            showData
-              ? "bg-[var(--control-primary)] text-white hover:opacity-90"
-              : "bg-white border border-[var(--border)] text-[var(--label-primary)] hover:bg-gray-50"
-          }`}
-        >
-          {showData ? "Hide data" : "Show data"}
-        </button>
-      </div>
-
       {/* Charts container */}
-      {showData ? (
-        <div className="flex-1 overflow-y-auto px-6 pb-6">
+      <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="max-w-[900px] mx-auto space-y-6">
             {/* Filter bar */}
             <div className="bg-white border border-[var(--border)] rounded-xl p-4">
@@ -759,21 +743,6 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ questions }) => {
             )}
           </div>
         </div>
-      ) : (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h2
-              className="text-2xl font-medium text-[var(--label-primary)] mb-2"
-              style={{ fontFamily: "Bitter, serif" }}
-            >
-              Results
-            </h2>
-            <p className="text-base text-[var(--label-light)]">
-              Click &quot;Show data&quot; to view survey response visualizations.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
