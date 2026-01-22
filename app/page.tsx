@@ -125,7 +125,7 @@ const initialSurveys: Survey[] = [
     questionCount: 5,
     status: "draft",
     lastUpdated: "07 March 2025",
-    createdBy: "Christian Højbo Møller",
+    createdBy: "Ed Orozco",
     collaborators: [
       { id: 101, name: "Johnny Pecorino", role: "editor" },
       { id: 102, name: "Frankie Bobby Boyle", role: "viewer" },
@@ -137,7 +137,7 @@ const initialSurveys: Survey[] = [
     questionCount: 5,
     status: "draft",
     lastUpdated: "07 March 2025",
-    createdBy: "Christian Højbo Møller",
+    createdBy: "Ed Orozco",
   },
   {
     id: 3,
@@ -147,7 +147,7 @@ const initialSurveys: Survey[] = [
     status: "sent",
     lastUpdated: "15 January 2026",
     sentDate: "15 January 2026",
-    createdBy: "Christian Højbo Møller",
+    createdBy: "Ed Orozco",
   },
   // Shared surveys - user is a collaborator
   {
@@ -158,10 +158,10 @@ const initialSurveys: Survey[] = [
     status: "sent",
     lastUpdated: "10 January 2026",
     sentDate: "05 January 2026",
-    createdBy: "Christian Højbo Møller",
+    createdBy: "Ed Orozco",
     sharedWith: {
       role: "viewer",
-      sharedBy: "Christian Højbo Møller",
+      sharedBy: "Ed Orozco",
     },
   },
   {
@@ -170,10 +170,10 @@ const initialSurveys: Survey[] = [
     questionCount: 8,
     status: "draft",
     lastUpdated: "18 January 2026",
-    createdBy: "Christian Højbo Møller",
+    createdBy: "Ed Orozco",
     sharedWith: {
       role: "editor",
-      sharedBy: "Christian Højbo Møller",
+      sharedBy: "Ed Orozco",
     },
   },
 ];
@@ -839,6 +839,7 @@ export default function Home() {
               recipients={recipients}
               collaborators={collaborators}
               surveyTitle={pageTitle}
+              createdBy={currentSurvey?.createdBy || "You"}
               onEditQuestions={() => setCurrentStep(1)}
               onEditRecipients={() => setCurrentStep(2)}
               onRecipientsChange={setRecipients}

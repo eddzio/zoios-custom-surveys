@@ -15,6 +15,7 @@ interface SettingsPageProps {
   recipients: Recipient[];
   collaborators: Collaborator[];
   surveyTitle: string;
+  createdBy: string;
   onEditQuestions: () => void;
   onEditRecipients: () => void;
   onRecipientsChange: (recipients: Recipient[]) => void;
@@ -57,6 +58,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   recipients,
   collaborators,
   surveyTitle,
+  createdBy,
   onEditQuestions,
   onEditRecipients,
   onRecipientsChange,
@@ -324,6 +326,32 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
               {/* Collaborator list */}
               <div className="flex flex-col gap-3">
+                {/* Creator row - not editable */}
+                <div className="flex items-end gap-3">
+                  {/* Person display */}
+                  <div className="flex-1 flex flex-col gap-1">
+                    <label className="text-base text-[var(--label-primary)]">
+                      Person
+                    </label>
+                    <div className="h-10 px-3 bg-[var(--bg-neutral)] border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] flex items-center">
+                      {createdBy}
+                    </div>
+                  </div>
+
+                  {/* Role display */}
+                  <div className="w-[140px] flex flex-col gap-1">
+                    <label className="text-base text-[var(--label-primary)]">
+                      Role
+                    </label>
+                    <div className="h-10 px-3 bg-[var(--bg-neutral)] border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] flex items-center">
+                      Owner
+                    </div>
+                  </div>
+
+                  {/* Spacer to align with other rows */}
+                  <div className="w-10 h-10" />
+                </div>
+
                 {collaborators.map((collaborator) => {
                   const existingIds = collaborators.filter((c) => c.id !== collaborator.id).map((c) => c.id);
                   const availableForSelect = availablePeople.filter(
