@@ -317,7 +317,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   className="text-xl font-medium text-black mb-1"
                   style={{ fontFamily: "Bitter, serif" }}
                 >
-                  Collaborator
+                  Collaborators
                 </h3>
                 <p className="text-base text-[var(--label-light)]">
                   Lets colleagues make changes to this survey. Editors can change the questions and recipients. Viewers can only see the results.
