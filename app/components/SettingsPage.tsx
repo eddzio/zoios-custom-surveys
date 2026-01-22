@@ -17,22 +17,28 @@ interface SettingsPageProps {
   surveyTitle: string;
   onEditQuestions: () => void;
   onEditRecipients: () => void;
+  onRecipientsChange: (recipients: Recipient[]) => void;
   onCollaboratorsChange: (collaborators: Collaborator[]) => void;
   onDeleteSurvey: () => void;
   triggerSave: (callback?: () => void) => void;
 }
 
-const Tag = ({ label }: { label: string }) => {
+const Tag = ({ label, onRemove }: { label: string; onRemove?: () => void }) => {
   return (
     <div className="flex items-center gap-1 px-2 py-1 bg-[var(--bg-neutral)] border border-[var(--border)] rounded">
       <span className="text-base text-[var(--label-light)] truncate max-w-[140px]">
         {label}
       </span>
-      <button className="w-6 h-6 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)]">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M3 3L11 11M11 3L3 11" strokeLinecap="round" />
-        </svg>
-      </button>
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="w-6 h-6 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)]"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M3 3L11 11M11 3L3 11" strokeLinecap="round" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 };
@@ -53,6 +59,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   surveyTitle,
   onEditQuestions,
   onEditRecipients,
+  onRecipientsChange,
   onCollaboratorsChange,
   onDeleteSurvey,
   triggerSave,
@@ -188,7 +195,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               <div className="p-6 pt-4 relative">
                 <div className="flex flex-wrap gap-2 max-h-[328px] overflow-y-auto custom-scrollbar pb-4">
                   {recipients.map((recipient) => (
-                    <Tag key={recipient.id} label={recipient.name} />
+                    <Tag
+                      key={recipient.id}
+                      label={recipient.name}
+                      onRemove={() => {
+                        onRecipientsChange(recipients.filter((r) => r.id !== recipient.id));
+                        triggerSave();
+                      }}
+                    />
                   ))}
                 </div>
                 {/* Gradient fade at bottom */}

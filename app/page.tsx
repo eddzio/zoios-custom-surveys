@@ -841,6 +841,7 @@ export default function Home() {
               surveyTitle={pageTitle}
               onEditQuestions={() => setCurrentStep(1)}
               onEditRecipients={() => setCurrentStep(2)}
+              onRecipientsChange={setRecipients}
               onCollaboratorsChange={setCollaborators}
               onDeleteSurvey={() => {
                 if (currentSurveyId) {
