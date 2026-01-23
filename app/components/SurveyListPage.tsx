@@ -115,7 +115,7 @@ const SurveyStatusLabel = ({ survey }: { survey: Survey }) => {
   if (survey.status === "draft") {
     return (
       <span
-        className="inline-flex items-center h-6 px-2 rounded text-xs font-medium bg-stone-100 text-stone-600"
+        className="inline-flex items-center h-6 px-2 rounded-md text-xs font-medium bg-stone-100 border border-stone-200 text-stone-800"
         style={{ fontFamily: 'Poppins, sans-serif' }}
       >
         Not sent
@@ -125,7 +125,7 @@ const SurveyStatusLabel = ({ survey }: { survey: Survey }) => {
 
   return (
     <span
-      className="inline-flex items-center h-6 px-2 rounded text-xs font-medium bg-green-100 text-green-700"
+      className="inline-flex items-center h-6 px-2 rounded-md text-xs font-medium border border-emerald-500 bg-white text-emerald-800"
       style={{ fontFamily: 'Poppins, sans-serif' }}
     >
       Sent

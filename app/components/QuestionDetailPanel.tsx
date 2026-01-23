@@ -46,28 +46,23 @@ const TypeSelector = ({
   const types: QuestionType[] = ["Text", "Scale", "Yes-no", "Multiple-choice"];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-1 shrink-0">
+    <select
+      value={selectedType}
+      onChange={(e) => onTypeChange(e.target.value as QuestionType)}
+      className="h-10 px-3 pr-8 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20 appearance-none cursor-pointer"
+      style={{
+        fontFamily: 'Poppins, sans-serif',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23737373' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 12px center',
+      }}
+    >
       {types.map((type) => (
-        <button
-          key={type}
-          onClick={() => onTypeChange(type)}
-          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-stone-50 shrink-0"
-        >
-          <div
-            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-              selectedType === type
-                ? "border-[var(--control-primary)] bg-[var(--control-primary)]"
-                : "border-[var(--border)] bg-white"
-            }`}
-          >
-            {selectedType === type && (
-              <div className="w-3 h-3 rounded-full bg-white" />
-            )}
-          </div>
-          <span className="text-base text-[var(--label-primary)]">{type}</span>
-        </button>
+        <option key={type} value={type}>
+          {type}
+        </option>
       ))}
-    </div>
+    </select>
   );
 };
 
