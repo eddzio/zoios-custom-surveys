@@ -61,25 +61,6 @@ const StepIndicator = ({ label, progress, onClick, disabled }: { label: string; 
   );
 };
 
-const RoundButton = ({ onClick, rotated = false }: { onClick?: () => void; rotated?: boolean }) => {
-  return (
-    <button
-      onClick={onClick}
-      className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-full shadow-sm hover:bg-stone-50 transition-colors shrink-0"
-    >
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 14 14"
-        fill="none"
-        className={rotated ? "rotate-180" : ""}
-      >
-        <path d="M8 12L4 7L8 2" stroke="var(--label-light)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    </button>
-  );
-};
-
 export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentStep = 1, onBack, onForward, onStepClick, disabledSteps = [], onPreview }) => {
   const getForwardButtonLabel = () => {
     if (currentStep === 3) return "Send survey";
@@ -90,19 +71,15 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentSt
 
   return (
     <div className="w-full bg-white border-b border-[var(--border)] flex items-center justify-between px-6 py-2">
-      {/* Back button */}
+      {/* Preview button */}
       <div className="w-[120px] shrink-0">
-        {allStepsDisabled ? (
-          <div /> // Empty space for viewer-only mode
-        ) : currentStep > 1 ? (
+        {!allStepsDisabled && onPreview && currentStep < 4 && (
           <button
-            onClick={onBack}
+            onClick={onPreview}
             className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
           >
-            Back
+            Preview survey
           </button>
-        ) : (
-          <RoundButton onClick={onBack} />
         )}
       </div>
 
@@ -119,18 +96,18 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentSt
         ))}
       </div>
 
-      {/* Forward button */}
+      {/* Back and Forward buttons */}
       <div className="flex items-center gap-2 justify-end shrink-0">
         {allStepsDisabled ? (
           <div /> // Empty space for viewer-only mode
-        ) : currentStep < 4 ? (
+        ) : currentStep < 4 && (
           <>
-            {onPreview && (
+            {currentStep > 1 && (
               <button
-                onClick={onPreview}
+                onClick={onBack}
                 className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
               >
-                Preview
+                Back
               </button>
             )}
             <button
@@ -140,8 +117,6 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentSt
               {getForwardButtonLabel()}
             </button>
           </>
-        ) : (
-          <RoundButton onClick={onForward} rotated={true} />
         )}
       </div>
     </div>

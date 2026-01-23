@@ -125,7 +125,7 @@ const SurveyStatusLabel = ({ survey }: { survey: Survey }) => {
 
   return (
     <span
-      className="inline-flex items-center h-6 px-2 rounded-md text-xs font-medium border border-emerald-500 bg-white text-emerald-800"
+      className="inline-flex items-center h-6 px-2 rounded-md text-xs font-medium border border-emerald-500 bg-emerald-50 text-emerald-800"
       style={{ fontFamily: 'Poppins, sans-serif' }}
     >
       Sent
