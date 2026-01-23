@@ -58,7 +58,7 @@ const generateEmployees = (): Employee[] => {
     "Dakota", "Reese", "Skyler", "Charlie", "Drew", "Emery", "Finley", "Hayden", "Kennedy", "Lane",
     "Marley", "Noah", "Oakley", "Parker", "Peyton", "Phoenix", "Remy", "River", "Rowan", "Sawyer",
     "Spencer", "Sydney", "Tatum", "Terry", "Val", "Blake", "Cameron", "Devon", "Ellis", "Francis",
-    "Gray", "Harper", "Indie", "Jesse", "Kai", "Lee", "Logan", "Micah", "Noel", "Ollie",
+    "stone", "Harper", "Indie", "Jesse", "Kai", "Lee", "Logan", "Micah", "Noel", "Ollie",
     "Pat", "Ray", "Robin", "Sam", "Shannon", "Shawn", "Toby", "Tracy", "Winter", "Zion",
   ];
 
@@ -145,7 +145,7 @@ const DimensionRow = ({
 }) => {
   return (
     <div
-      className={`flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-50 ${
+      className={`flex items-center gap-3 w-full p-2 rounded-lg hover:bg-stone-50 ${
         isSelected ? "bg-[#f5f5f4]" : ""
       }`}
     >
@@ -190,7 +190,7 @@ const SegmentRow = ({
   return (
     <button
       onClick={onToggle}
-      className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-50 text-left"
+      className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-stone-50 text-left"
     >
       <CheckboxIcon state={state} />
       <span className="text-base text-[var(--label-primary)]">{label}</span>

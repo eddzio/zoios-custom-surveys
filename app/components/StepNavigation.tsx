@@ -35,7 +35,7 @@ const StepIndicator = ({ label, progress, onClick, disabled }: { label: string; 
     <button
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors shrink-0 ${isCurrent ? "flex" : "hidden lg:flex"} ${disabled ? "cursor-not-allowed opacity-60" : "hover:bg-gray-50"}`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors shrink-0 ${isCurrent ? "flex" : "hidden lg:flex"} ${disabled ? "cursor-not-allowed opacity-60" : "hover:bg-stone-50"}`}
     >
       {progress === "current" ? (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -64,7 +64,7 @@ const RoundButton = ({ onClick, rotated = false }: { onClick?: () => void; rotat
   return (
     <button
       onClick={onClick}
-      className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-full shadow-sm hover:bg-gray-50 transition-colors shrink-0"
+      className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-full shadow-sm hover:bg-stone-50 transition-colors shrink-0"
     >
       <svg
         width="14"
@@ -96,7 +96,7 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentSt
         ) : currentStep > 1 ? (
           <button
             onClick={onBack}
-            className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0"
+            className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
           >
             Back
           </button>

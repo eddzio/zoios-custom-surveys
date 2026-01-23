@@ -216,7 +216,7 @@ const Checkbox = ({
   return (
     <button
       onClick={onChange}
-      className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-50 text-left"
+      className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-stone-50 text-left"
     >
       <CheckboxIcon state={state} />
       <span className="text-base text-[var(--label-primary)]">{label}</span>
@@ -239,7 +239,7 @@ const DimensionRow = ({
 }) => {
   return (
     <div
-      className={`flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-50 ${
+      className={`flex items-center gap-3 w-full p-2 rounded-lg hover:bg-stone-50 ${
         isSelected ? "bg-[#f5f5f4]" : ""
       }`}
     >

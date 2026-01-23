@@ -51,7 +51,7 @@ const TypeSelector = ({
         <button
           key={type}
           onClick={() => onTypeChange(type)}
-          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-50 shrink-0"
+          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-stone-50 shrink-0"
         >
           <div
             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
@@ -112,7 +112,7 @@ const ScaleTypeSelector = ({
         <button
           key={type.value}
           onClick={() => onScaleTypeChange(type.value)}
-          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-50"
+          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-stone-50"
         >
           <div
             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
@@ -249,7 +249,7 @@ const MultipleChoiceOptions = ({
               {options.length > 1 && (
                 <button
                   onClick={() => handleRemoveOption(index)}
-                  className="w-10 h-10 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)] hover:bg-gray-50 rounded-lg"
+                  className="w-10 h-10 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)] hover:bg-stone-50 rounded-lg"
                 >
                   <svg
                     width="14"
@@ -269,7 +269,7 @@ const MultipleChoiceOptions = ({
       </div>
       <button
         onClick={handleAddOption}
-        className="flex items-center gap-2 h-10 px-4 py-2 text-base font-medium text-[var(--control-primary)] hover:bg-gray-50 rounded-lg self-start"
+        className="flex items-center gap-2 h-10 px-4 py-2 text-base font-medium text-[var(--control-primary)] hover:bg-stone-50 rounded-lg self-start"
       >
         + Add option
       </button>
@@ -340,7 +340,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
           </div>
           <button
             onClick={onCopy}
-            className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-gray-50"
+            className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-stone-50"
           >
             <svg
               width="14"
@@ -356,7 +356,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
           </button>
           <button
             onClick={onDelete}
-            className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-gray-50"
+            className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-stone-50"
           >
             <svg
               width="14"
@@ -421,7 +421,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
             }}
             disabled={!canMoveDown}
             className={`w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm ${
-              canMoveDown ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+              canMoveDown ? 'hover:bg-stone-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
             }`}
             title="Move down"
           >
@@ -443,7 +443,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
             }}
             disabled={!canMoveUp}
             className={`w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm ${
-              canMoveUp ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+              canMoveUp ? 'hover:bg-stone-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
             }`}
             title="Move up"
           >

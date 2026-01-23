@@ -5,8 +5,9 @@ import { motion } from "framer-motion";
 import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle, MoreVertical } from "react-feather";
 import { toast } from "sonner";
 import { StepNavigation } from "./components/StepNavigation";
-import { QuestionListSidebar, QuestionItem } from "./components/QuestionListSidebar";
+import { QuestionListSidebar, QuestionItem, Section } from "./components/QuestionListSidebar";
 import { QuestionDetailPanel } from "./components/QuestionDetailPanel";
+import { SectionBlock } from "./components/SectionBlock";
 import { RecipientsPage } from "./components/RecipientsPage";
 import { SettingsPage } from "./components/SettingsPage";
 import { ResultsPage } from "./components/ResultsPage";
@@ -133,10 +134,12 @@ const initialSurveys: Survey[] = [
   },
   {
     id: 2,
-    name: "Workcation Evaluation 2024 Barcelona",
-    questionCount: 5,
-    status: "draft",
-    lastUpdated: "07 March 2025",
+    name: "Team Satisfaction Q1 2026",
+    questionCount: 8,
+    responseCount: 0,
+    status: "sent",
+    lastUpdated: "20 January 2026",
+    sentDate: "20 January 2026",
     createdBy: "Ed Orozco",
   },
   {
@@ -186,10 +189,13 @@ export default function Home() {
 
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number>(1);
+  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
   const [questions, setQuestions] = useState<QuestionItem[]>(initialQuestions);
+  const [sections, setSections] = useState<Section[]>([]);
   const [deleteError, setDeleteError] = useState<number | null>(null);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [movingQuestionId, setMovingQuestionId] = useState<number | null>(null);
+  const [movingSectionId, setMovingSectionId] = useState<number | null>(null);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
 
   // Page title state
@@ -393,6 +399,74 @@ export default function Home() {
     }
   };
 
+  // Section handlers
+  const handleAddSection = () => {
+    const newId = sections.length > 0 ? Math.max(...sections.map((s) => s.id)) + 1 : 1;
+    const newSection: Section = {
+      id: newId,
+      name: `Section ${newId + 1}`,
+      afterQuestionIndex: questions.length - 1, // Add after the last question
+    };
+    setSections([...sections, newSection]);
+    setSelectedSectionId(newId);
+    setSelectedQuestionId(0); // Deselect any question
+    triggerSave();
+
+    // Scroll to new section after a brief delay
+    setTimeout(() => {
+      document.getElementById(`section-${newId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  };
+
+  const handleSectionSelect = (id: number) => {
+    setSelectedSectionId(id);
+    setSelectedQuestionId(0); // Deselect any question
+    document.getElementById(`section-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const updateSection = (id: number, updates: Partial<Section>) => {
+    setSections(sections.map((s) => (s.id === id ? { ...s, ...updates } : s)));
+    triggerSave();
+  };
+
+  const handleDeleteSection = (id: number) => {
+    setSections(sections.filter((s) => s.id !== id));
+    if (selectedSectionId === id) {
+      setSelectedSectionId(null);
+      // Select first question if available
+      if (questions.length > 0) {
+        setSelectedQuestionId(questions[0].id);
+      }
+    }
+    triggerSave();
+  };
+
+  const handleMoveSection = (id: number, direction: 'up' | 'down') => {
+    const section = sections.find((s) => s.id === id);
+    if (!section) return;
+
+    setMovingSectionId(id);
+
+    const currentIndex = section.afterQuestionIndex;
+    let newIndex = currentIndex;
+
+    if (direction === 'up' && currentIndex > 0) {
+      newIndex = currentIndex - 1;
+    } else if (direction === 'down' && currentIndex < questions.length - 1) {
+      newIndex = currentIndex + 1;
+    }
+
+    if (newIndex !== currentIndex) {
+      setSections(sections.map((s) =>
+        s.id === id ? { ...s, afterQuestionIndex: newIndex } : s
+      ));
+      triggerSave();
+    }
+
+    // Reset moving state after animation
+    setTimeout(() => setMovingSectionId(null), 300);
+  };
+
   // Survey list handlers
   const handleCreateSurvey = () => {
     const newId = Math.max(...surveys.map((s) => s.id), 0) + 1;
@@ -421,6 +495,8 @@ export default function Home() {
       multipleChoiceOptions: ["", ""],
     }]);
     setSelectedQuestionId(1);
+    setSelectedSectionId(null);
+    setSections([]);
     setRecipients([]);
     setCollaborators([]);
     setCurrentStep(1);
@@ -620,7 +696,7 @@ export default function Home() {
                       onChange={handleTitleChange}
                       onKeyDown={handleTitleKeyDown}
                       autoFocus
-                      className="text-2xl font-semibold text-[var(--label-primary)] bg-gray-100 px-2 py-1 rounded-lg outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+                      className="text-2xl font-semibold text-[var(--label-primary)] bg-stone-100 px-2 py-1 rounded-lg outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
                       style={{
                         fontFamily: 'Bitter, serif',
                         letterSpacing: '-0.48px',
@@ -637,7 +713,7 @@ export default function Home() {
                         setEditedTitle(pageTitle);
                       }}
                       className={`text-2xl font-semibold text-[var(--label-primary)] px-2 py-1 rounded-lg transition-colors whitespace-nowrap ${
-                        isTitleHovered ? 'bg-gray-100 cursor-text' : ''
+                        isTitleHovered ? 'bg-stone-100 cursor-text' : ''
                       }`}
                       style={{
                         fontFamily: 'Bitter, serif',
@@ -656,7 +732,7 @@ export default function Home() {
                 <div className="relative" ref={surveyMenuRef}>
                   <button
                     onClick={() => setIsSurveyMenuOpen(!isSurveyMenuOpen)}
-                    className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--label-light)] hover:bg-gray-100 hover:text-[var(--label-primary)] transition-colors"
+                    className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--label-light)] hover:bg-stone-100 hover:text-[var(--label-primary)] transition-colors"
                   >
                     <MoreVertical size={20} />
                   </button>
@@ -664,19 +740,19 @@ export default function Home() {
                     <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1 z-20">
                       <button
                         onClick={handleRenameFromMenu}
-                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-50 transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-stone-50 transition-colors"
                       >
                         Rename
                       </button>
                       <button
                         onClick={handleDuplicateFromMenu}
-                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-50 transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-stone-50 transition-colors"
                       >
                         Duplicate survey
                       </button>
                       <button
                         onClick={handleDeleteFromMenu}
-                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-negative)] hover:bg-gray-50 transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-negative)] hover:bg-stone-50 transition-colors"
                       >
                         Delete survey
                       </button>
@@ -693,7 +769,7 @@ export default function Home() {
                     </button>
                     <button
                       onClick={handleCancelTitle}
-                      className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0"
+                      className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
                     >
                       Cancel
                     </button>
@@ -725,7 +801,7 @@ export default function Home() {
               )}
               <button
                 onClick={handleBackToList}
-                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0"
+                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
               >
                 Back to surveys
               </button>
@@ -753,73 +829,150 @@ export default function Home() {
               {/* Question list sidebar */}
               <QuestionListSidebar
                 questions={questions}
+                sections={sections}
                 selectedQuestionId={selectedQuestionId}
+                selectedSectionId={selectedSectionId}
                 onQuestionSelect={handleQuestionSelect}
+                onSectionSelect={handleSectionSelect}
                 onAddQuestion={handleAddQuestion}
                 onMoveQuestion={handleMoveQuestion}
               />
 
-              {/* Question detail panels - ALL questions */}
+              {/* Question detail panels - ALL questions with sections */}
               <div className="flex-1 bg-[#fafaf9] p-3 overflow-y-auto">
                 <div className="max-w-[900px] mx-auto flex flex-col gap-3">
-                  {questions.map((question) => (
-                    <motion.div
-                      key={question.id}
-                      layout
-                      layoutId={`question-card-${question.id}`}
-                      transition={{ type: "spring", mass: 1, stiffness: 230, damping: 25 }}
-                      onLayoutAnimationComplete={() => {
-                        if (movingQuestionId === question.id) {
-                          setMovingQuestionId(null);
-                        }
-                      }}
-                      id={`question-${question.id}`}
-                      onClick={() => setSelectedQuestionId(question.id)}
-                      style={{ zIndex: movingQuestionId === question.id ? 10 : 1 }}
-                      className={`relative cursor-pointer ${selectedQuestionId === question.id ? "ring-1 ring-[var(--control-primary)] ring-opacity-30 rounded-2xl" : ""}`}
-                    >
-                      <QuestionDetailPanel
-                        questionNumber={question.number}
-                        questionText={question.questionText}
-                        description={question.description}
-                        questionType={question.questionType}
-                        isRequired={question.isRequired}
-                        showDeleteError={deleteError === question.id}
-                        scaleType={question.scaleType}
-                        scaleMinLabel={question.scaleMinLabel}
-                        scaleMaxLabel={question.scaleMaxLabel}
-                        multipleChoiceOptions={question.multipleChoiceOptions}
-                        canMoveUp={questions.findIndex((q) => q.id === question.id) > 0}
-                        canMoveDown={questions.findIndex((q) => q.id === question.id) < questions.length - 1}
-                        onQuestionChange={(text) => updateQuestion(question.id, { questionText: text })}
-                        onDescriptionChange={(text) => updateQuestion(question.id, { description: text })}
-                        onTypeChange={(type) => updateQuestion(question.id, { questionType: type })}
-                        onRequiredChange={(required) => updateQuestion(question.id, { isRequired: required })}
-                        onScaleTypeChange={(scaleType) => updateQuestion(question.id, { scaleType })}
-                        onScaleMinLabelChange={(scaleMinLabel) => updateQuestion(question.id, { scaleMinLabel })}
-                        onScaleMaxLabelChange={(scaleMaxLabel) => updateQuestion(question.id, { scaleMaxLabel })}
-                        onMultipleChoiceOptionsChange={(multipleChoiceOptions) => updateQuestion(question.id, { multipleChoiceOptions })}
-                        onCopy={() => {
-                          const newId = Math.max(...questions.map((q) => q.id)) + 1;
-                          const copiedQuestion = { ...question, id: newId, number: String(newId) };
-                          setQuestions([...questions, copiedQuestion]);
-                          setTimeout(() => {
-                            setSelectedQuestionId(newId);
-                            document.getElementById(`question-${newId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-                          }, 100);
-                        }}
-                        onDelete={() => handleDeleteQuestion(question.id)}
-                        onMoveUp={() => handleMoveQuestion(question.id, 'up')}
-                        onMoveDown={() => handleMoveQuestion(question.id, 'down')}
-                      />
-                    </motion.div>
-                  ))}
+                  {(() => {
+                    // Build list with sections interspersed
+                    const items: Array<{ type: 'question' | 'section'; data: QuestionItem | Section }> = [];
+                    const sortedSections = [...sections].sort((a, b) => a.afterQuestionIndex - b.afterQuestionIndex);
+                    let sectionIndex = 0;
+
+                    questions.forEach((question, index) => {
+                      items.push({ type: 'question', data: question });
+
+                      // Check if any sections should appear after this question
+                      while (
+                        sectionIndex < sortedSections.length &&
+                        sortedSections[sectionIndex].afterQuestionIndex === index
+                      ) {
+                        items.push({ type: 'section', data: sortedSections[sectionIndex] });
+                        sectionIndex++;
+                      }
+                    });
+
+                    // Add any remaining sections at the end
+                    while (sectionIndex < sortedSections.length) {
+                      items.push({ type: 'section', data: sortedSections[sectionIndex] });
+                      sectionIndex++;
+                    }
+
+                    return items.map((item) => {
+                      if (item.type === 'question') {
+                        const question = item.data as QuestionItem;
+                        return (
+                          <motion.div
+                            key={`question-${question.id}`}
+                            layout
+                            layoutId={`question-card-${question.id}`}
+                            transition={{ type: "spring", mass: 1, stiffness: 230, damping: 25 }}
+                            onLayoutAnimationComplete={() => {
+                              if (movingQuestionId === question.id) {
+                                setMovingQuestionId(null);
+                              }
+                            }}
+                            id={`question-${question.id}`}
+                            onClick={() => {
+                              setSelectedQuestionId(question.id);
+                              setSelectedSectionId(null);
+                            }}
+                            style={{ zIndex: movingQuestionId === question.id ? 10 : 1 }}
+                            className={`relative cursor-pointer ${selectedQuestionId === question.id ? "ring-1 ring-[var(--control-primary)] ring-opacity-30 rounded-2xl" : ""}`}
+                          >
+                            <QuestionDetailPanel
+                              questionNumber={question.number}
+                              questionText={question.questionText}
+                              description={question.description}
+                              questionType={question.questionType}
+                              isRequired={question.isRequired}
+                              showDeleteError={deleteError === question.id}
+                              scaleType={question.scaleType}
+                              scaleMinLabel={question.scaleMinLabel}
+                              scaleMaxLabel={question.scaleMaxLabel}
+                              multipleChoiceOptions={question.multipleChoiceOptions}
+                              canMoveUp={questions.findIndex((q) => q.id === question.id) > 0}
+                              canMoveDown={questions.findIndex((q) => q.id === question.id) < questions.length - 1}
+                              onQuestionChange={(text) => updateQuestion(question.id, { questionText: text })}
+                              onDescriptionChange={(text) => updateQuestion(question.id, { description: text })}
+                              onTypeChange={(type) => updateQuestion(question.id, { questionType: type })}
+                              onRequiredChange={(required) => updateQuestion(question.id, { isRequired: required })}
+                              onScaleTypeChange={(scaleType) => updateQuestion(question.id, { scaleType })}
+                              onScaleMinLabelChange={(scaleMinLabel) => updateQuestion(question.id, { scaleMinLabel })}
+                              onScaleMaxLabelChange={(scaleMaxLabel) => updateQuestion(question.id, { scaleMaxLabel })}
+                              onMultipleChoiceOptionsChange={(multipleChoiceOptions) => updateQuestion(question.id, { multipleChoiceOptions })}
+                              onCopy={() => {
+                                const newId = Math.max(...questions.map((q) => q.id)) + 1;
+                                const copiedQuestion = { ...question, id: newId, number: String(newId) };
+                                setQuestions([...questions, copiedQuestion]);
+                                setTimeout(() => {
+                                  setSelectedQuestionId(newId);
+                                  setSelectedSectionId(null);
+                                  document.getElementById(`question-${newId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                                }, 100);
+                              }}
+                              onDelete={() => handleDeleteQuestion(question.id)}
+                              onMoveUp={() => handleMoveQuestion(question.id, 'up')}
+                              onMoveDown={() => handleMoveQuestion(question.id, 'down')}
+                            />
+                          </motion.div>
+                        );
+                      } else {
+                        const section = item.data as Section;
+                        return (
+                          <motion.div
+                            key={`section-${section.id}`}
+                            layout
+                            layoutId={`section-card-${section.id}`}
+                            transition={{ type: "spring", mass: 1, stiffness: 230, damping: 25 }}
+                            onLayoutAnimationComplete={() => {
+                              if (movingSectionId === section.id) {
+                                setMovingSectionId(null);
+                              }
+                            }}
+                            id={`section-${section.id}`}
+                            onClick={() => {
+                              setSelectedSectionId(section.id);
+                              setSelectedQuestionId(0);
+                            }}
+                            style={{ zIndex: movingSectionId === section.id ? 10 : 1 }}
+                            className={`relative cursor-pointer ${selectedSectionId === section.id ? "ring-1 ring-[var(--control-primary)] ring-opacity-30 rounded-2xl" : ""}`}
+                          >
+                            <SectionBlock
+                              name={section.name}
+                              canMoveUp={section.afterQuestionIndex > 0}
+                              canMoveDown={section.afterQuestionIndex < questions.length - 1}
+                              onNameChange={(name) => updateSection(section.id, { name })}
+                              onDelete={() => handleDeleteSection(section.id)}
+                              onMoveUp={() => handleMoveSection(section.id, 'up')}
+                              onMoveDown={() => handleMoveSection(section.id, 'down')}
+                            />
+                          </motion.div>
+                        );
+                      }
+                    });
+                  })()}
                   {/* Add question button */}
                   <button
                     onClick={handleAddQuestion}
-                    className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-gray-50 transition-colors self-center whitespace-nowrap shrink-0"
+                    className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-stone-50 transition-colors self-center whitespace-nowrap shrink-0"
                   >
                     Add question
+                  </button>
+                  {/* Add section button */}
+                  <button
+                    onClick={handleAddSection}
+                    className="w-full h-10 border border-dashed border-[var(--label-light)] text-[var(--label-light)] text-base font-medium rounded-2xl hover:bg-stone-50 hover:border-[var(--label-primary)] hover:text-[var(--label-primary)] transition-colors"
+                  >
+                    Add section
                   </button>
                 </div>
               </div>

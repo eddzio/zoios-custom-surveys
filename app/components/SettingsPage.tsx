@@ -149,7 +149,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </h3>
                 <button
                   onClick={onEditQuestions}
-                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0"
+                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-stone-50 whitespace-nowrap shrink-0"
                 >
                   Edit
                 </button>
@@ -189,7 +189,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </h3>
                 <button
                   onClick={onEditRecipients}
-                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0"
+                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-stone-50 whitespace-nowrap shrink-0"
                 >
                   Edit
                 </button>
@@ -303,7 +303,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 {/* Preview button */}
                 <button
                   onClick={() => setShowEmailPreview(true)}
-                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0 self-start"
+                  className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-stone-50 whitespace-nowrap shrink-0 self-start"
                 >
                   Preview email
                 </button>
@@ -482,7 +482,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               </h2>
               <button
                 onClick={() => setShowEmailPreview(false)}
-                className="w-10 h-10 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)] hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-10 h-10 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)] hover:bg-stone-100 rounded-lg transition-colors"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M5 5L15 15M15 5L5 15" strokeLinecap="round" />
@@ -629,7 +629,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             <div className="flex justify-end p-6 border-t border-[var(--border)]">
               <button
                 onClick={() => setShowEmailPreview(false)}
-                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-gray-50 whitespace-nowrap shrink-0"
+                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg hover:bg-stone-50 whitespace-nowrap shrink-0"
               >
                 Close
               </button>

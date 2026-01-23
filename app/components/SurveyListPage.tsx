@@ -65,7 +65,7 @@ const SurveyRowMenu = ({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
+        className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-stone-100 transition-colors"
       >
         <MoreVertical size={14} className="text-[var(--label-light)]" />
       </button>
@@ -78,7 +78,7 @@ const SurveyRowMenu = ({
               onDuplicate();
               setIsOpen(false);
             }}
-            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-100 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-stone-100 transition-colors"
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Duplicate survey
@@ -89,7 +89,7 @@ const SurveyRowMenu = ({
               onEdit();
               setIsOpen(false);
             }}
-            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-gray-100 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-stone-100 transition-colors"
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Edit survey
@@ -108,6 +108,28 @@ const SurveyRowMenu = ({
         </div>
       )}
     </div>
+  );
+};
+
+const SurveyStatusLabel = ({ survey }: { survey: Survey }) => {
+  if (survey.status === "draft") {
+    return (
+      <span
+        className="inline-flex items-center h-6 px-2 rounded text-xs font-medium bg-stone-100 text-stone-600"
+        style={{ fontFamily: 'Poppins, sans-serif' }}
+      >
+        Not sent
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="inline-flex items-center h-6 px-2 rounded text-xs font-medium bg-green-100 text-green-700"
+      style={{ fontFamily: 'Poppins, sans-serif' }}
+    >
+      Sent
+    </span>
   );
 };
 
@@ -131,12 +153,15 @@ const SurveyRow = ({
     >
       {/* Left - Name and stats */}
       <div className="flex-1 flex flex-col gap-1">
-        <p
-          className="text-base font-medium text-[var(--label-primary)]"
-          style={{ fontFamily: 'Poppins, sans-serif' }}
-        >
-          {survey.name}
-        </p>
+        <div className="flex items-center gap-2">
+          <p
+            className="text-base font-medium text-[var(--label-primary)]"
+            style={{ fontFamily: 'Poppins, sans-serif' }}
+          >
+            {survey.name}
+          </p>
+          <SurveyStatusLabel survey={survey} />
+        </div>
         <div className="flex items-center gap-2 text-[13px] text-[var(--label-light)]" style={{ fontFamily: 'Poppins, sans-serif' }}>
           <span>{survey.questionCount} questions</span>
           {survey.status === "sent" && survey.responseCount !== undefined && (
