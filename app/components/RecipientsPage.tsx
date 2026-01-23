@@ -273,24 +273,14 @@ const DimensionRow = ({
 
 const Tag = ({
   label,
-  onRemove,
 }: {
   label: string;
-  onRemove: () => void;
 }) => {
   return (
-    <div className="flex items-center gap-1 px-2 py-1 bg-[#f5f5f4] border border-[var(--border)] rounded">
+    <div className="flex items-center px-2 py-1 bg-[#f5f5f4] border border-[var(--border)] rounded">
       <span className="text-base text-[var(--label-light)] truncate max-w-[150px]">
         {label}
       </span>
-      <button
-        onClick={onRemove}
-        className="w-6 h-6 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)]"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M2 2L12 12M12 2L2 12" strokeLinecap="round" />
-        </svg>
-      </button>
     </div>
   );
 };
@@ -557,7 +547,6 @@ export const RecipientsPage: React.FC<RecipientsPageProps> = ({
               <Tag
                 key={recipient.id}
                 label={recipient.name}
-                onRemove={() => handleRemoveRecipient(recipient.id)}
               />
             ))}
           </div>
