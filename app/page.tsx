@@ -452,7 +452,7 @@ export default function Home() {
     const currentIndex = section.afterQuestionIndex;
     let newIndex = currentIndex;
 
-    if (direction === 'up' && currentIndex > 0) {
+    if (direction === 'up' && currentIndex >= 0) {
       newIndex = currentIndex - 1;
     } else if (direction === 'down' && currentIndex < questions.length - 1) {
       newIndex = currentIndex + 1;
