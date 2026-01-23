@@ -16,6 +16,7 @@ interface StepNavigationProps {
   onForward?: () => void;
   onStepClick?: (stepNumber: number) => void;
   disabledSteps?: number[];
+  onPreview?: () => void;
 }
 
 const StepIndicator = ({ label, progress, onClick, disabled }: { label: string; progress: StepProgress; onClick?: () => void; disabled?: boolean }) => {
@@ -79,7 +80,7 @@ const RoundButton = ({ onClick, rotated = false }: { onClick?: () => void; rotat
   );
 };
 
-export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentStep = 1, onBack, onForward, onStepClick, disabledSteps = [] }) => {
+export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentStep = 1, onBack, onForward, onStepClick, disabledSteps = [], onPreview }) => {
   const getForwardButtonLabel = () => {
     if (currentStep === 3) return "Send survey";
     return "Continue";
@@ -119,16 +120,26 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentSt
       </div>
 
       {/* Forward button */}
-      <div className="w-[120px] flex justify-end shrink-0">
+      <div className="flex items-center gap-2 justify-end shrink-0">
         {allStepsDisabled ? (
           <div /> // Empty space for viewer-only mode
         ) : currentStep < 4 ? (
-          <button
-            onClick={onForward}
-            className="h-10 px-4 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
-          >
-            {getForwardButtonLabel()}
-          </button>
+          <>
+            {onPreview && (
+              <button
+                onClick={onPreview}
+                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
+              >
+                Preview
+              </button>
+            )}
+            <button
+              onClick={onForward}
+              className="h-10 px-4 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
+            >
+              {getForwardButtonLabel()}
+            </button>
+          </>
         ) : (
           <RoundButton onClick={onForward} rotated={true} />
         )}

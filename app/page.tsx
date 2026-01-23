@@ -12,6 +12,7 @@ import { RecipientsPage } from "./components/RecipientsPage";
 import { SettingsPage } from "./components/SettingsPage";
 import { ResultsPage } from "./components/ResultsPage";
 import { SurveyListPage, Survey, Collaborator } from "./components/SurveyListPage";
+import { RespondentSurveyPage } from "./components/RespondentSurveyPage";
 
 // Initial state with pizza-themed questions spanning all types
 const initialQuestions: QuestionItem[] = [
@@ -188,6 +189,7 @@ export default function Home() {
   const [currentSurveyId, setCurrentSurveyId] = useState<number | null>(null);
 
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number>(1);
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
   const [questions, setQuestions] = useState<QuestionItem[]>(initialQuestions);
@@ -603,6 +605,19 @@ export default function Home() {
     }
   };
 
+  // Show preview mode
+  if (isPreviewMode) {
+    return (
+      <RespondentSurveyPage
+        surveyTitle={pageTitle}
+        surveyDescription="Please take a few minutes to complete this survey. Your feedback is valuable to us."
+        questions={questions}
+        sections={sections}
+        onClose={() => setIsPreviewMode(false)}
+      />
+    );
+  }
+
   return (
     <div className="h-screen bg-[#fffaf6] overflow-hidden relative">
       {/* Navbar - floating on left */}
@@ -818,6 +833,7 @@ export default function Home() {
                 onBack={handleBack}
                 onForward={handleForward}
                 onStepClick={handleStepClick}
+                onPreview={() => setIsPreviewMode(true)}
               />
             </div>
           )}
