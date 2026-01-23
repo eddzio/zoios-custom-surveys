@@ -322,18 +322,17 @@ export const RespondentSurveyPage: React.FC<RespondentSurveyPageProps> = ({
       {/* Question content in rounded white container */}
       <div className="max-w-2xl w-full mx-auto flex-1">
         <div className="bg-white border border-[var(--border)] rounded-2xl p-6">
-          {/* Section indicator */}
-          {currentSection && (
-            <div
-              className="text-sm font-medium text-stone-800 mb-2"
-              style={{ fontFamily: 'Poppins, sans-serif' }}
-            >
-              {currentSection.name}
-            </div>
-          )}
-
           {/* Question */}
           <div className="mb-8">
+            {/* Section label */}
+            {currentSection && (
+              <div
+                className="text-xs font-medium text-stone-500 uppercase tracking-wide mb-2"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                {currentSection.name}
+              </div>
+            )}
             <h2
               className="text-xl font-semibold text-[var(--label-primary)] mb-2"
               style={{ fontFamily: 'Bitter, serif' }}
