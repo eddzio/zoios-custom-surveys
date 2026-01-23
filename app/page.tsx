@@ -852,6 +852,7 @@ export default function Home() {
                 onSectionSelect={handleSectionSelect}
                 onAddQuestion={handleAddQuestion}
                 onMoveQuestion={handleMoveQuestion}
+                onMoveSection={handleMoveSection}
               />
 
               {/* Question detail panels - ALL questions with sections */}

@@ -34,26 +34,80 @@ interface QuestionListSidebarProps {
   onSectionSelect?: (id: number) => void;
   onAddQuestion?: () => void;
   onMoveQuestion?: (id: number, direction: "up" | "down") => void;
+  onMoveSection?: (id: number, direction: "up" | "down") => void;
 }
+
+const MoveArrows = ({
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = true,
+  canMoveDown = true,
+}: {
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+}) => {
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onMoveDown();
+        }}
+        disabled={!canMoveDown}
+        className={`w-8 h-8 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg transition-colors ${
+          canMoveDown ? 'hover:bg-stone-100' : 'opacity-40 cursor-not-allowed'
+        }`}
+      >
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 2v8M3 7l3 3 3-3" stroke="var(--label-light)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onMoveUp();
+        }}
+        disabled={!canMoveUp}
+        className={`w-8 h-8 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg transition-colors ${
+          canMoveUp ? 'hover:bg-stone-100' : 'opacity-40 cursor-not-allowed'
+        }`}
+      >
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 10V2M3 5l3-3 3 3" stroke="var(--label-light)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  );
+};
 
 const SectionDivider = ({
   name,
   isSelected,
-  onClick
+  onClick,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = true,
+  canMoveDown = true,
 }: {
   name: string;
   isSelected: boolean;
   onClick: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
 }) => {
   return (
-    <button
+    <div
       onClick={onClick}
       className={`
-        w-full flex items-center gap-2 px-6 py-1 transition-colors
+        group w-full flex items-center gap-2 px-6 py-1 transition-colors cursor-pointer
         ${isSelected ? 'bg-[#f5f5f4]' : 'hover:bg-stone-50'}
       `}
     >
-      <div className="flex items-center justify-center gap-2 w-full">
+      <div className="flex items-center justify-center gap-2 flex-1 min-w-0">
         <div
           className="flex-1 h-0 border-t border-dashed border-[var(--label-light)]"
         />
@@ -67,24 +121,42 @@ const SectionDivider = ({
           className="flex-1 h-0 border-t border-dashed border-[var(--label-light)]"
         />
       </div>
-    </button>
+      {onMoveUp && onMoveDown && (
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          <MoveArrows
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            canMoveUp={canMoveUp}
+            canMoveDown={canMoveDown}
+          />
+        </div>
+      )}
+    </div>
   );
 };
 
 const QuestionRow = ({
   question,
   isSelected,
-  onClick
+  onClick,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = true,
+  canMoveDown = true,
 }: {
   question: QuestionItem;
   isSelected: boolean;
   onClick: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
 }) => {
   return (
-    <button
+    <div
       onClick={onClick}
       className={`
-        w-full flex items-center gap-2 px-6 py-2 text-left transition-colors
+        group w-full flex items-center gap-2 px-6 py-2 text-left transition-colors cursor-pointer
         ${isSelected
           ? 'border-l-2 border-[var(--label-primary)] text-[var(--label-primary)] bg-[#f5f5f4]'
           : 'text-[var(--label-light)] hover:bg-stone-50'
@@ -98,7 +170,7 @@ const QuestionRow = ({
         {question.number}
       </span>
       <span
-        className="flex-1 overflow-hidden"
+        className="flex-1 overflow-hidden min-w-0"
         style={{
           fontFamily: 'Poppins, sans-serif',
           display: '-webkit-box',
@@ -108,7 +180,17 @@ const QuestionRow = ({
       >
         {question.questionText || `Question ${question.number}`}
       </span>
-    </button>
+      {onMoveUp && onMoveDown && (
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          <MoveArrows
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            canMoveUp={canMoveUp}
+            canMoveDown={canMoveDown}
+          />
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -120,6 +202,8 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
   onQuestionSelect,
   onSectionSelect,
   onAddQuestion,
+  onMoveQuestion,
+  onMoveSection,
 }) => {
   // Build the list with sections interspersed
   const buildListWithSections = () => {
@@ -172,9 +256,13 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
           </button>
         </div>
         <div className="flex-1 flex flex-col gap-1 overflow-y-auto">
-          {listItems.map((item) => {
+          {listItems.map((item, index) => {
             if (item.type === 'question') {
               const question = item.data as QuestionItem;
+              const questionIndex = questions.findIndex(q => q.id === question.id);
+              const canMoveUp = questionIndex > 0;
+              const canMoveDown = questionIndex < questions.length - 1;
+
               return (
                 <motion.div
                   key={`question-${question.id}`}
@@ -186,11 +274,19 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
                     question={question}
                     isSelected={selectedQuestionId === question.id}
                     onClick={() => onQuestionSelect?.(question.id)}
+                    onMoveUp={onMoveQuestion ? () => onMoveQuestion(question.id, "up") : undefined}
+                    onMoveDown={onMoveQuestion ? () => onMoveQuestion(question.id, "down") : undefined}
+                    canMoveUp={canMoveUp}
+                    canMoveDown={canMoveDown}
                   />
                 </motion.div>
               );
             } else {
               const section = item.data as Section;
+              const sectionIndex = sections.findIndex(s => s.id === section.id);
+              const canMoveUp = sectionIndex > 0 || section.afterQuestionIndex > 0;
+              const canMoveDown = section.afterQuestionIndex < questions.length - 1;
+
               return (
                 <motion.div
                   key={`section-${section.id}`}
@@ -202,6 +298,10 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
                     name={section.name}
                     isSelected={selectedSectionId === section.id}
                     onClick={() => onSectionSelect?.(section.id)}
+                    onMoveUp={onMoveSection ? () => onMoveSection(section.id, "up") : undefined}
+                    onMoveDown={onMoveSection ? () => onMoveSection(section.id, "down") : undefined}
+                    canMoveUp={canMoveUp}
+                    canMoveDown={canMoveDown}
                   />
                 </motion.div>
               );
