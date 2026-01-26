@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle, MoreVertical } from "react-feather";
+import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle, MoreVertical, Users } from "react-feather";
 import { toast } from "sonner";
 import { StepNavigation } from "./components/StepNavigation";
 import { QuestionListSidebar, QuestionItem, Section } from "./components/QuestionListSidebar";
@@ -13,6 +13,7 @@ import { SettingsPage } from "./components/SettingsPage";
 import { ResultsPage } from "./components/ResultsPage";
 import { SurveyListPage, Survey, Collaborator } from "./components/SurveyListPage";
 import { RespondentSurveyPage } from "./components/RespondentSurveyPage";
+import { GroupsPage } from "./components/GroupsPage";
 
 // Initial state with pizza-themed questions spanning all types
 const initialQuestions: QuestionItem[] = [
@@ -183,8 +184,8 @@ const initialSurveys: Survey[] = [
 ];
 
 export default function Home() {
-  // View state: "list" shows survey list, "editor" shows survey editor
-  const [currentView, setCurrentView] = useState<"list" | "editor">("list");
+  // View state: "list" shows survey list, "editor" shows survey editor, "groups" shows groups management
+  const [currentView, setCurrentView] = useState<"list" | "editor" | "groups">("list");
   const [surveys, setSurveys] = useState<Survey[]>(initialSurveys);
   const [currentSurveyId, setCurrentSurveyId] = useState<number | null>(null);
 
@@ -632,8 +633,25 @@ export default function Home() {
           <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
             <HomeIcon size={20} />
           </button>
-          <button className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--bg-neutral)] text-[var(--label-primary)]">
+          <button
+            onClick={() => setCurrentView("list")}
+            className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+              currentView === "list" || currentView === "editor"
+                ? "bg-[var(--bg-neutral)] text-[var(--label-primary)]"
+                : "text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)]"
+            }`}
+          >
             <PlusCircle size={20} />
+          </button>
+          <button
+            onClick={() => setCurrentView("groups")}
+            className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+              currentView === "groups"
+                ? "bg-[var(--bg-neutral)] text-[var(--label-primary)]"
+                : "text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)]"
+            }`}
+          >
+            <Users size={20} />
           </button>
           <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
             <Settings size={20} />
@@ -655,7 +673,9 @@ export default function Home() {
       <div className="h-full flex justify-center py-4 pl-[100px]">
         <div className="w-full max-w-[1300px] bg-white rounded-2xl border border-[var(--border)] flex flex-col overflow-hidden">
 
-          {currentView === "list" ? (
+          {currentView === "groups" ? (
+            <GroupsPage />
+          ) : currentView === "list" ? (
             <SurveyListPage
               surveys={surveys}
               onCreateSurvey={handleCreateSurvey}
