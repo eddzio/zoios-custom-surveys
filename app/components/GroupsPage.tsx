@@ -1,7 +1,19 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Search, Users, User, ChevronRight, X, Award } from "react-feather";
+import {
+  ReactFlow,
+  Node,
+  Edge,
+  useNodesState,
+  useEdgesState,
+  Background,
+  BackgroundVariant,
+  Controls,
+  MarkerType,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 
 // Types
 interface Group {
@@ -269,6 +281,101 @@ const flattenGroups = (
   return result;
 };
 
+// Helper to convert groups to React Flow nodes and edges
+const groupsToFlow = (
+  groups: Group[],
+  parentId: string | null = null,
+  level: number = 0,
+  siblingIndex: number = 0,
+  siblingCount: number = 1
+): { nodes: Node[]; edges: Edge[] } => {
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+
+  const nodeWidth = 140;
+  const nodeHeight = 36;
+  const horizontalGap = 40;
+  const verticalGap = 60;
+
+  // Calculate subtree width recursively (for top-to-bottom layout)
+  const getSubtreeWidth = (group: Group): number => {
+    if (group.children.length === 0) return nodeWidth;
+    let totalWidth = 0;
+    for (const child of group.children) {
+      totalWidth += getSubtreeWidth(child) + horizontalGap;
+    }
+    return totalWidth - horizontalGap;
+  };
+
+  // Build nodes recursively with proper positioning (top-to-bottom)
+  const buildNodes = (
+    groups: Group[],
+    parentId: string | null,
+    level: number,
+    startX: number
+  ): number => {
+    let currentX = startX;
+
+    for (let i = 0; i < groups.length; i++) {
+      const group = groups[i];
+      const subtreeWidth = getSubtreeWidth(group);
+      const nodeX = currentX + subtreeWidth / 2 - nodeWidth / 2;
+
+      nodes.push({
+        id: group.id,
+        position: { x: nodeX, y: level * (nodeHeight + verticalGap) },
+        data: {
+          label: group.name,
+          owner: group.owner,
+          memberCount: group.memberCount,
+        },
+        style: {
+          width: nodeWidth,
+          height: nodeHeight,
+          padding: "6px 10px",
+          borderRadius: "8px",
+          border: "1px solid var(--border)",
+          backgroundColor: "var(--bg-primary)",
+          fontSize: "13px",
+          fontWeight: 500,
+          color: "var(--label-primary)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        },
+      });
+
+      if (parentId) {
+        edges.push({
+          id: `${parentId}-${group.id}`,
+          source: parentId,
+          target: group.id,
+          type: "default",
+          style: { stroke: "var(--border-neutral)", strokeWidth: 1.5 },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: "var(--border-neutral)",
+            width: 16,
+            height: 16,
+          },
+        });
+      }
+
+      if (group.children.length > 0) {
+        buildNodes(group.children, group.id, level + 1, currentX);
+      }
+
+      currentX += subtreeWidth + horizontalGap;
+    }
+
+    return currentX;
+  };
+
+  buildNodes(groups, parentId, 0, 0);
+
+  return { nodes, edges };
+};
+
 interface GroupsPageProps {
   onEditGroup?: (groupId: string) => void;
 }
@@ -288,6 +395,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
     columnIndex: number;
   } | null>(null);
   const [newSiblingName, setNewSiblingName] = useState("");
+  const [activeTab, setActiveTab] = useState<"columns" | "chart">("columns");
 
   const columnsContainerRef = useRef<HTMLDivElement>(null);
   const categoryInputRef = useRef<HTMLInputElement>(null);
@@ -513,10 +621,24 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
         </div>
         {/* Tabs */}
         <div className="flex gap-0 border-b border-[var(--border)]">
-          <button className="px-4 py-2 text-sm font-medium text-[var(--label-primary)] border-b-2 border-[var(--control-primary)]">
+          <button
+            onClick={() => setActiveTab("columns")}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === "columns"
+                ? "text-[var(--label-primary)] border-b-2 border-[var(--control-primary)]"
+                : "text-[var(--label-light)] hover:text-[var(--label-primary)]"
+            }`}
+          >
             Columns
           </button>
-          <button className="px-4 py-2 text-sm font-medium text-[var(--label-light)] hover:text-[var(--label-primary)] transition-colors">
+          <button
+            onClick={() => setActiveTab("chart")}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === "chart"
+                ? "text-[var(--label-primary)] border-b-2 border-[var(--control-primary)]"
+                : "text-[var(--label-light)] hover:text-[var(--label-primary)]"
+            }`}
+          >
             Chart
           </button>
         </div>
@@ -592,6 +714,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
         </div>
 
         {/* Groups columns */}
+        {activeTab === "columns" && (
         <div className="flex-1 flex flex-col overflow-hidden">
           <div
             ref={columnsContainerRef}
@@ -744,7 +867,56 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
             </div>
           )}
         </div>
+        )}
+
+        {/* Chart view */}
+        {activeTab === "chart" && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {selectedCategory ? (
+              <ChartView groups={selectedCategory.groups} />
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-[var(--label-light)]">
+                Select a category to view chart
+              </div>
+            )}
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+// Chart view component
+function ChartView({ groups }: { groups: Group[] }) {
+  const { nodes: initialNodes, edges: initialEdges } = groupsToFlow(groups);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Update nodes/edges when groups change
+  useEffect(() => {
+    const { nodes: newNodes, edges: newEdges } = groupsToFlow(groups);
+    setNodes(newNodes);
+    setEdges(newEdges);
+  }, [groups, setNodes, setEdges]);
+
+  return (
+    <div className="flex-1 w-full h-full [&_.react-flow__handle]:hidden">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={false}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.1}
+        maxZoom={2}
+      >
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--border)" />
+        <Controls showInteractive={false} />
+      </ReactFlow>
     </div>
   );
 }
