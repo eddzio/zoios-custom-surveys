@@ -49,7 +49,7 @@ const TypeSelector = ({
     <select
       value={selectedType}
       onChange={(e) => onTypeChange(e.target.value as QuestionType)}
-      className="h-10 px-3 pr-8 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20 appearance-none cursor-pointer"
+      className="h-10 px-3 pr-8 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20 appearance-none cursor-pointer"
       style={{
         fontFamily: 'Poppins, sans-serif',
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23737373' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
@@ -81,7 +81,7 @@ const ToggleSwitch = ({
       }`}
     >
       <div
-        className={`w-6 h-6 bg-white rounded-full transition-transform ${
+        className={`w-6 h-6 bg-[var(--bg-card)] rounded-full transition-transform ${
           enabled ? "translate-x-[22px]" : "translate-x-0"
         }`}
       />
@@ -107,17 +107,17 @@ const ScaleTypeSelector = ({
         <button
           key={type.value}
           onClick={() => onScaleTypeChange(type.value)}
-          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-stone-50"
+          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-[var(--bg-neutral)]"
         >
           <div
             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
               selectedScaleType === type.value
                 ? "border-[var(--control-primary)] bg-[var(--control-primary)]"
-                : "border-[var(--border)] bg-white"
+                : "border-[var(--border)] bg-[var(--bg-card)]"
             }`}
           >
             {selectedScaleType === type.value && (
-              <div className="w-3 h-3 rounded-full bg-white" />
+              <div className="w-3 h-3 rounded-full bg-[var(--bg-card)]" />
             )}
           </div>
           <span className="text-base text-[var(--label-primary)]">{type.label}</span>
@@ -166,7 +166,7 @@ const ScaleOptions = ({
             value={minLabel}
             onChange={(e) => onMinLabelChange(e.target.value)}
             placeholder="e.g. Never"
-            className="h-10 px-3 py-1 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+            className="h-10 px-3 py-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
           />
         </div>
         <div className="flex items-end gap-4 py-4 flex-1 justify-center">
@@ -186,7 +186,7 @@ const ScaleOptions = ({
             value={maxLabel}
             onChange={(e) => onMaxLabelChange(e.target.value)}
             placeholder="e.g. Always"
-            className="h-10 px-3 py-1 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+            className="h-10 px-3 py-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
           />
         </div>
       </div>
@@ -226,7 +226,7 @@ const MultipleChoiceOptions = ({
         {options.map((option, index) => (
           <div key={index} className="flex gap-3 items-start">
             <div
-              className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-full shadow-sm flex-shrink-0"
+              className="w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-full shadow-sm flex-shrink-0"
               style={{ fontFamily: 'DM Mono, monospace' }}
             >
               <span className="text-sm text-[var(--label-primary)]">
@@ -239,12 +239,12 @@ const MultipleChoiceOptions = ({
                 value={option}
                 onChange={(e) => handleOptionChange(index, e.target.value)}
                 placeholder="e.g. Never"
-                className="h-10 w-[256px] px-3 py-1 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+                className="h-10 w-[256px] px-3 py-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
               />
               {options.length > 1 && (
                 <button
                   onClick={() => handleRemoveOption(index)}
-                  className="w-10 h-10 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)] hover:bg-stone-50 rounded-lg"
+                  className="w-10 h-10 flex items-center justify-center text-[var(--label-light)] hover:text-[var(--label-primary)] hover:bg-[var(--bg-neutral)] rounded-lg"
                 >
                   <svg
                     width="14"
@@ -264,7 +264,7 @@ const MultipleChoiceOptions = ({
       </div>
       <button
         onClick={handleAddOption}
-        className="flex items-center gap-2 h-10 px-4 py-2 text-base font-medium text-[var(--control-primary)] hover:bg-stone-50 rounded-lg self-start"
+        className="flex items-center gap-2 h-10 px-4 py-2 text-base font-medium text-[var(--control-primary)] hover:bg-[var(--bg-neutral)] rounded-lg self-start"
       >
         + Add option
       </button>
@@ -299,7 +299,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
   onMoveDown,
 }) => {
   return (
-    <div className="bg-white border border-[var(--border)] rounded-2xl overflow-hidden">
+    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl overflow-hidden">
       {/* Delete Error Banner */}
       {showDeleteError && (
         <div className="bg-red-500 text-white px-6 py-3 text-sm font-medium">
@@ -311,7 +311,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
       <div className="border-b border-[var(--border)] flex flex-wrap items-start justify-between p-6 gap-4">
         <div className="flex flex-col lg:flex-row lg:items-center gap-3 shrink-0">
           <div
-            className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-full shadow-sm shrink-0"
+            className="w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-full shadow-sm shrink-0"
             style={{ fontFamily: 'DM Mono, monospace' }}
           >
             <span className="text-sm text-[var(--label-primary)]">
@@ -335,7 +335,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
           </div>
           <button
             onClick={onCopy}
-            className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-stone-50"
+            className="w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-sm hover:bg-[var(--bg-neutral)]"
           >
             <svg
               width="14"
@@ -351,7 +351,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
           </button>
           <button
             onClick={onDelete}
-            className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-stone-50"
+            className="w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-sm hover:bg-[var(--bg-neutral)]"
           >
             <svg
               width="14"
@@ -377,7 +377,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
             type="text"
             value={questionText}
             onChange={(e) => onQuestionChange?.(e.target.value)}
-            className="h-10 px-3 py-1 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+            className="h-10 px-3 py-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -388,7 +388,7 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
             type="text"
             value={description}
             onChange={(e) => onDescriptionChange?.(e.target.value)}
-            className="h-10 px-3 py-1 bg-white border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+            className="h-10 px-3 py-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-base text-[var(--label-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
           />
         </div>
         {questionType === "Scale" && (
@@ -415,8 +415,8 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
               onMoveDown?.();
             }}
             disabled={!canMoveDown}
-            className={`w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm ${
-              canMoveDown ? 'hover:bg-stone-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+            className={`w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-sm ${
+              canMoveDown ? 'hover:bg-[var(--bg-neutral)] cursor-pointer' : 'opacity-40 cursor-not-allowed'
             }`}
             title="Move down"
           >
@@ -437,8 +437,8 @@ export const QuestionDetailPanel: React.FC<QuestionDetailProps> = ({
               onMoveUp?.();
             }}
             disabled={!canMoveUp}
-            className={`w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm ${
-              canMoveUp ? 'hover:bg-stone-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+            className={`w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-sm ${
+              canMoveUp ? 'hover:bg-[var(--bg-neutral)] cursor-pointer' : 'opacity-40 cursor-not-allowed'
             }`}
             title="Move up"
           >

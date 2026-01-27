@@ -240,7 +240,7 @@ const DimensionRow = ({
   return (
     <div
       className={`flex items-center gap-3 w-full p-2 rounded-lg hover:bg-stone-50 ${
-        isSelected ? "bg-[#f5f5f4]" : ""
+        isSelected ? "bg-[var(--bg-neutral)]" : ""
       }`}
     >
       <button onClick={onToggle} className="shrink-0">
@@ -277,7 +277,7 @@ const Tag = ({
   label: string;
 }) => {
   return (
-    <div className="flex items-center px-2 py-1 bg-[#f5f5f4] border border-[var(--border)] rounded">
+    <div className="flex items-center px-2 py-1 bg-[var(--bg-neutral)] border border-[var(--border)] rounded">
       <span className="text-base text-[var(--label-light)] truncate max-w-[150px]">
         {label}
       </span>
@@ -407,7 +407,7 @@ export const RecipientsPage: React.FC<RecipientsPageProps> = ({
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Main content area */}
-      <div className="flex-1 flex overflow-hidden bg-[#f5f5f4]">
+      <div className="flex-1 flex overflow-hidden bg-[var(--bg-neutral)]">
         {/* Left panel - Selection */}
         <div className="flex-[2] flex flex-col bg-white border-r border-[var(--border)]">
           {/* Header */}

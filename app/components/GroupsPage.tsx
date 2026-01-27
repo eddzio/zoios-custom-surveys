@@ -472,7 +472,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-                className="w-64 h-10 pl-10 pr-4 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-30"
+                className="w-64 h-10 pl-10 pr-4 bg-[var(--control-secondary)] border border-[var(--border)] rounded-lg text-sm text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-30"
               />
               {searchQuery && (
                 <button
@@ -485,7 +485,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
             </div>
             {/* Search results dropdown */}
             {isSearchFocused && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[var(--border)] rounded-lg shadow-lg max-h-64 overflow-y-auto z-20">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--control-secondary)] border border-[var(--border)] rounded-lg shadow-lg max-h-64 overflow-y-auto z-20">
                 {searchResults.slice(0, 10).map((result) => {
                   const category = categories.find(
                     (c) => c.id === result.categoryId
@@ -496,7 +496,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                       onClick={() =>
                         handleSearchResultClick(result.categoryId, result.path)
                       }
-                      className="w-full px-4 py-2 text-left hover:bg-stone-50 transition-colors"
+                      className="w-full px-4 py-2 text-left hover:bg-[var(--bg-neutral)] transition-colors"
                     >
                       <div className="text-sm font-medium text-[var(--label-primary)]">
                         {result.group.name}
@@ -533,7 +533,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
             </h2>
             <button
               onClick={() => setAddingCategoryInline(true)}
-              className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-stone-50 transition-colors"
+              className="h-10 px-4 bg-[var(--control-secondary)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors"
             >
               + Add category
             </button>
@@ -546,8 +546,8 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                 onClick={() => handleCategorySelect(category.id)}
                 className={`w-full flex items-center justify-between px-4 py-2 rounded-lg transition-colors ${
                   selectedCategoryId === category.id
-                    ? "bg-stone-100"
-                    : "hover:bg-stone-50"
+                    ? "bg-[var(--bg-neutral)]"
+                    : "hover:bg-[var(--bg-neutral)]"
                 }`}
               >
                 <span
@@ -584,7 +584,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                     }
                   }}
                   placeholder="Category name"
-                  className="w-full h-10 px-3 bg-white border border-[var(--control-primary)] rounded-lg text-sm text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none"
+                  className="w-full h-10 px-3 bg-[var(--control-secondary)] border border-[var(--control-primary)] rounded-lg text-sm text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none"
                 />
               </div>
             )}
@@ -612,7 +612,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                   <div className="flex-1 overflow-y-auto p-1">
                     {/* Chrome - shows info about the parent group whose children are displayed */}
                     {parentGroup && (
-                      <div className="m-1 mb-2 p-3 bg-white border border-[var(--border)] rounded-xl">
+                      <div className="m-1 mb-2 p-3 bg-[var(--control-secondary)] border border-[var(--border)] rounded-xl">
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-sm font-medium text-[var(--label-primary)]">
                             {parentGroup.name}
@@ -632,7 +632,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                         </div>
                         <button
                           onClick={() => handleEditGroup(parentGroup.id)}
-                          className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-stone-50 transition-colors"
+                          className="h-10 px-4 bg-[var(--control-secondary)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors"
                         >
                           Edit group
                         </button>
@@ -651,8 +651,8 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                           }
                           className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
                             isSelected
-                              ? "bg-stone-100"
-                              : "hover:bg-stone-50"
+                              ? "bg-[var(--bg-neutral)]"
+                              : "hover:bg-[var(--bg-neutral)]"
                           }`}
                         >
                           <span
@@ -695,7 +695,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                           }
                         }}
                         placeholder="Group name"
-                        className="w-full h-10 px-3 bg-white border border-[var(--control-primary)] rounded-lg text-sm text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none"
+                        className="w-full h-10 px-3 bg-[var(--control-secondary)] border border-[var(--control-primary)] rounded-lg text-sm text-[var(--label-primary)] placeholder:text-[var(--label-light)] focus:outline-none"
                       />
                     </div>
                   ) : (
@@ -725,9 +725,9 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
           {/* Horizontal scrollbar area */}
           {columns.length > 3 && (
             <div className="h-12 border-t border-[var(--border)] px-4 flex items-center">
-              <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-[var(--bg-neutral)] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-stone-300 rounded-full"
+                  className="h-full bg-[var(--border-neutral)] rounded-full"
                   style={{
                     width: `${Math.min(100, (3 / columns.length) * 100)}%`,
                     marginLeft: `${

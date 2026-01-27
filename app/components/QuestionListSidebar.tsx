@@ -56,8 +56,8 @@ const MoveArrows = ({
           onMoveDown();
         }}
         disabled={!canMoveDown}
-        className={`w-8 h-8 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg transition-colors ${
-          canMoveDown ? 'hover:bg-stone-100' : 'opacity-40 cursor-not-allowed'
+        className={`w-8 h-8 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg transition-colors ${
+          canMoveDown ? 'hover:bg-[var(--bg-neutral)]' : 'opacity-40 cursor-not-allowed'
         }`}
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -70,8 +70,8 @@ const MoveArrows = ({
           onMoveUp();
         }}
         disabled={!canMoveUp}
-        className={`w-8 h-8 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg transition-colors ${
-          canMoveUp ? 'hover:bg-stone-100' : 'opacity-40 cursor-not-allowed'
+        className={`w-8 h-8 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg transition-colors ${
+          canMoveUp ? 'hover:bg-[var(--bg-neutral)]' : 'opacity-40 cursor-not-allowed'
         }`}
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -104,7 +104,7 @@ const SectionDivider = ({
       onClick={onClick}
       className={`
         group w-full flex items-center gap-2 px-6 py-1 transition-colors cursor-pointer
-        ${isSelected ? 'bg-[#f5f5f4]' : 'hover:bg-stone-50'}
+        ${isSelected ? 'bg-[var(--bg-neutral)]' : 'hover:bg-[var(--bg-neutral)]'}
       `}
     >
       <div className="flex items-center justify-center gap-2 flex-1 min-w-0">
@@ -158,8 +158,8 @@ const QuestionRow = ({
       className={`
         group w-full flex items-center gap-2 px-6 py-2 text-left transition-colors cursor-pointer
         ${isSelected
-          ? 'border-l-2 border-[var(--label-primary)] text-[var(--label-primary)] bg-[#f5f5f4]'
-          : 'text-[var(--label-light)] hover:bg-stone-50'
+          ? 'border-l-2 border-[var(--label-primary)] text-[var(--label-primary)] bg-[var(--bg-neutral)]'
+          : 'text-[var(--label-light)] hover:bg-[var(--bg-neutral)]'
         }
       `}
     >
@@ -239,7 +239,7 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
   const listItems = buildListWithSections();
 
   return (
-    <div className="hidden lg:flex w-[372px] bg-white flex-col h-full border-r border-[var(--border)]">
+    <div className="hidden lg:flex w-[372px] bg-[var(--bg-card)] flex-col h-full border-r border-[var(--border)]">
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="px-6 py-6 flex items-center justify-between">
           <h2
@@ -250,7 +250,7 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
           </h2>
           <button
             onClick={onAddQuestion}
-            className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] rounded-lg shadow-sm hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
+            className="h-10 px-4 bg-[var(--bg-card)] border border-[var(--border)] text-[var(--label-primary)] rounded-lg shadow-sm hover:bg-[var(--bg-neutral)] transition-colors whitespace-nowrap shrink-0"
           >
             <span className="label-button">Add question</span>
           </button>

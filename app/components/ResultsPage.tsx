@@ -146,7 +146,7 @@ const DimensionRow = ({
   return (
     <div
       className={`flex items-center gap-3 w-full p-2 rounded-lg hover:bg-stone-50 ${
-        isSelected ? "bg-[#f5f5f4]" : ""
+        isSelected ? "bg-[var(--bg-neutral)]" : ""
       }`}
     >
       <button onClick={onToggle} className="shrink-0">

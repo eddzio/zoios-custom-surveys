@@ -65,20 +65,20 @@ const SurveyRowMenu = ({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-stone-100 transition-colors"
+        className="w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-sm hover:bg-[var(--bg-neutral)] transition-colors"
       >
         <MoreVertical size={14} className="text-[var(--label-light)]" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1 min-w-[160px] z-20">
+        <div className="absolute right-0 top-full mt-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-lg py-1 min-w-[160px] z-20">
           <button
             onClick={(e) => {
               e.stopPropagation();
               onDuplicate();
               setIsOpen(false);
             }}
-            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-stone-100 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-[var(--bg-neutral)] transition-colors"
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Duplicate survey
@@ -89,7 +89,7 @@ const SurveyRowMenu = ({
               onEdit();
               setIsOpen(false);
             }}
-            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-stone-100 transition-colors"
+            className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-[var(--bg-neutral)] transition-colors"
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Edit survey
@@ -115,7 +115,7 @@ const SurveyStatusLabel = ({ survey }: { survey: Survey }) => {
   if (survey.status === "draft") {
     return (
       <span
-        className="inline-flex items-center h-6 px-2 rounded-md text-xs font-medium bg-stone-100 border border-stone-200 text-stone-800"
+        className="inline-flex items-center h-6 px-2 rounded-md text-xs font-medium bg-[var(--bg-neutral)] border border-stone-200 text-stone-800"
         style={{ fontFamily: 'Poppins, sans-serif' }}
       >
         Not sent
@@ -149,7 +149,7 @@ const SurveyRow = ({
   return (
     <div
       onClick={onClick}
-      className="flex items-center p-6 border-b border-[var(--border)] hover:bg-[#f5f5f4] transition-colors cursor-pointer"
+      className="flex items-center p-6 border-b border-[var(--border)] hover:bg-[var(--bg-neutral)] transition-colors cursor-pointer"
     >
       {/* Left - Name and stats */}
       <div className="flex-1 flex flex-col gap-1">

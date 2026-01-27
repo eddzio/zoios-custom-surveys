@@ -620,9 +620,9 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen bg-[#fffaf6] overflow-hidden relative">
+    <div className="h-screen bg-[var(--background)] overflow-hidden relative">
       {/* Navbar - floating on left */}
-      <div className="fixed left-4 top-4 bottom-4 w-[68px] bg-white border border-[var(--border)] rounded-2xl flex flex-col items-center py-4 z-10">
+      <div className="fixed left-4 top-4 bottom-4 w-[68px] bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl flex flex-col items-center py-4 z-10">
         {/* Logo placeholder */}
         <div className="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center mb-6">
           <span className="text-white font-bold text-lg">C</span>
@@ -671,7 +671,7 @@ export default function Home() {
 
       {/* Main content - centered container */}
       <div className="h-full flex justify-center py-4 pl-[100px]">
-        <div className="w-full max-w-[1300px] bg-white rounded-2xl border border-[var(--border)] flex flex-col overflow-hidden">
+        <div className="w-full max-w-[1300px] bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] flex flex-col overflow-hidden">
 
           {currentView === "groups" ? (
             <GroupsPage />
@@ -731,7 +731,7 @@ export default function Home() {
                       onChange={handleTitleChange}
                       onKeyDown={handleTitleKeyDown}
                       autoFocus
-                      className="text-2xl font-semibold text-[var(--label-primary)] bg-stone-100 px-2 py-1 rounded-lg outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
+                      className="text-2xl font-semibold text-[var(--label-primary)] bg-[var(--bg-neutral)] px-2 py-1 rounded-lg outline-none focus:ring-1 focus:ring-[var(--control-primary)] focus:ring-opacity-20"
                       style={{
                         fontFamily: 'Bitter, serif',
                         letterSpacing: '-0.48px',
@@ -748,7 +748,7 @@ export default function Home() {
                         setEditedTitle(pageTitle);
                       }}
                       className={`text-2xl font-semibold text-[var(--label-primary)] px-2 py-1 rounded-lg transition-colors whitespace-nowrap ${
-                        isTitleHovered ? 'bg-stone-100 cursor-text' : ''
+                        isTitleHovered ? 'bg-[var(--bg-neutral)] cursor-text' : ''
                       }`}
                       style={{
                         fontFamily: 'Bitter, serif',
@@ -767,27 +767,27 @@ export default function Home() {
                 <div className="relative" ref={surveyMenuRef}>
                   <button
                     onClick={() => setIsSurveyMenuOpen(!isSurveyMenuOpen)}
-                    className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--label-light)] hover:bg-stone-100 hover:text-[var(--label-primary)] transition-colors"
+                    className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors"
                   >
                     <MoreVertical size={20} />
                   </button>
                   {isSurveyMenuOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-[var(--border)] rounded-lg shadow-lg py-1 z-20">
+                    <div className="absolute top-full left-0 mt-1 w-48 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-lg py-1 z-20">
                       <button
                         onClick={handleRenameFromMenu}
-                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-stone-50 transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-[var(--bg-neutral)] transition-colors"
                       >
                         Rename
                       </button>
                       <button
                         onClick={handleDuplicateFromMenu}
-                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-stone-50 transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-primary)] hover:bg-[var(--bg-neutral)] transition-colors"
                       >
                         Duplicate survey
                       </button>
                       <button
                         onClick={handleDeleteFromMenu}
-                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-negative)] hover:bg-stone-50 transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm text-[var(--label-negative)] hover:bg-[var(--bg-neutral)] transition-colors"
                       >
                         Delete survey
                       </button>
@@ -804,7 +804,7 @@ export default function Home() {
                     </button>
                     <button
                       onClick={handleCancelTitle}
-                      className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
+                      className="h-10 px-4 bg-[var(--bg-card)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors whitespace-nowrap shrink-0"
                     >
                       Cancel
                     </button>
@@ -836,7 +836,7 @@ export default function Home() {
               )}
               <button
                 onClick={handleBackToList}
-                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-stone-50 transition-colors whitespace-nowrap shrink-0"
+                className="h-10 px-4 bg-[var(--bg-card)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors whitespace-nowrap shrink-0"
               >
                 Back to surveys
               </button>
@@ -876,7 +876,7 @@ export default function Home() {
               />
 
               {/* Question detail panels - ALL questions with sections */}
-              <div className="flex-1 bg-[#fafaf9] p-3 overflow-y-auto">
+              <div className="flex-1 bg-[var(--background)] p-3 overflow-y-auto">
                 <div className="max-w-[900px] mx-auto flex flex-col gap-3">
                   {(() => {
                     // Build list with sections interspersed
@@ -1000,14 +1000,14 @@ export default function Home() {
                   {/* Add question button */}
                   <button
                     onClick={handleAddQuestion}
-                    className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-stone-50 transition-colors self-center whitespace-nowrap shrink-0"
+                    className="h-10 px-4 bg-[var(--bg-card)] border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-[var(--bg-neutral)] transition-colors self-center whitespace-nowrap shrink-0"
                   >
                     Add question
                   </button>
                   {/* Add section button */}
                   <button
                     onClick={handleAddSection}
-                    className="w-full h-10 border border-dashed border-[var(--label-light)] text-[var(--label-light)] text-base font-medium rounded-2xl hover:bg-stone-50 hover:border-[var(--label-primary)] hover:text-[var(--label-primary)] transition-colors"
+                    className="w-full h-10 border border-dashed border-[var(--label-light)] text-[var(--label-light)] text-base font-medium rounded-2xl hover:bg-[var(--bg-neutral)] hover:border-[var(--label-primary)] hover:text-[var(--label-primary)] transition-colors"
                   >
                     Add section
                   </button>

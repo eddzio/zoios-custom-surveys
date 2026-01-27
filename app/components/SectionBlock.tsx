@@ -55,7 +55,7 @@ export const SectionBlock: React.FC<SectionBlockProps> = ({
   };
 
   return (
-    <div className="bg-white border border-[var(--border)] rounded-2xl p-6 flex items-center gap-8">
+    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 flex items-center gap-8">
       {/* Move buttons */}
       <div className="flex items-center gap-3">
         <button
@@ -64,8 +64,8 @@ export const SectionBlock: React.FC<SectionBlockProps> = ({
             onMoveDown?.();
           }}
           disabled={!canMoveDown}
-          className={`w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm ${
-            canMoveDown ? 'hover:bg-stone-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+          className={`w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-sm ${
+            canMoveDown ? 'hover:bg-[var(--bg-neutral)] cursor-pointer' : 'opacity-40 cursor-not-allowed'
           }`}
           title="Move down"
         >
@@ -86,8 +86,8 @@ export const SectionBlock: React.FC<SectionBlockProps> = ({
             onMoveUp?.();
           }}
           disabled={!canMoveUp}
-          className={`w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm ${
-            canMoveUp ? 'hover:bg-stone-50 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+          className={`w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-sm ${
+            canMoveUp ? 'hover:bg-[var(--bg-neutral)] cursor-pointer' : 'opacity-40 cursor-not-allowed'
           }`}
           title="Move up"
         >
@@ -115,7 +115,7 @@ export const SectionBlock: React.FC<SectionBlockProps> = ({
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full h-10 px-2 bg-[#f5f5f4] rounded-lg text-xl font-semibold text-[var(--label-primary)] focus:outline-none"
+                className="w-full h-10 px-2 bg-[var(--bg-neutral)] rounded-lg text-xl font-semibold text-[var(--label-primary)] focus:outline-none"
                 style={{
                   fontFamily: 'Poppins, sans-serif',
                   letterSpacing: '-0.4px',
@@ -125,7 +125,7 @@ export const SectionBlock: React.FC<SectionBlockProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={handleCancel}
-                className="h-10 px-4 bg-white border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-stone-50 transition-colors"
+                className="h-10 px-4 bg-[var(--bg-card)] border border-[var(--border)] text-[var(--label-primary)] text-base font-medium rounded-lg shadow-sm hover:bg-[var(--bg-neutral)] transition-colors"
               >
                 Cancel
               </button>
@@ -140,7 +140,7 @@ export const SectionBlock: React.FC<SectionBlockProps> = ({
         ) : (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex-1 max-w-[456px] h-10 px-2 text-left hover:bg-[#f5f5f4] rounded-lg transition-colors"
+            className="flex-1 max-w-[456px] h-10 px-2 text-left hover:bg-[var(--bg-neutral)] rounded-lg transition-colors"
           >
             <span
               className="text-xl font-semibold text-[var(--label-primary)]"
@@ -162,7 +162,7 @@ export const SectionBlock: React.FC<SectionBlockProps> = ({
             e.stopPropagation();
             onDelete?.();
           }}
-          className="w-10 h-10 flex items-center justify-center bg-white border border-[var(--border)] rounded-lg shadow-sm hover:bg-stone-50"
+          className="w-10 h-10 flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-sm hover:bg-[var(--bg-neutral)]"
           title="Delete section"
         >
           <svg
