@@ -612,13 +612,6 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                   className="w-64 flex-shrink-0 border-r border-[var(--border)] flex flex-col"
                 >
                   <div className="flex-1 overflow-y-auto p-1">
-                    {/* Owner label at top of column (for non-last columns with a parent) */}
-                    {!isLastColumn && parentGroup && parentGroup.owner && (
-                      <div className="flex items-center gap-1.5 px-3 py-2 text-[var(--label-light)]">
-                        <Award size={12} />
-                        <span className="text-xs">{parentGroup.owner}</span>
-                      </div>
-                    )}
                     {/* Chrome - shows info about the parent group whose children are displayed */}
                     {isLastColumn && parentGroup && (
                       <div className="m-1 mb-2 p-3 bg-[var(--control-secondary)] border border-[var(--border)] rounded-xl">
