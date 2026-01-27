@@ -599,6 +599,8 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
           >
             {columns.map((column, columnIndex) => {
               // Find the parent group for this column (to show the chrome)
+              // Only show chrome in the last column
+              const isLastColumn = columnIndex === columns.length - 1;
               const parentGroupId = columnIndex > 0 ? selectedPath[columnIndex] : null;
               const parentGroup = parentGroupId
                 ? findGroupByPath(categories, selectedPath.slice(0, columnIndex + 1))
@@ -611,7 +613,7 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                 >
                   <div className="flex-1 overflow-y-auto p-1">
                     {/* Chrome - shows info about the parent group whose children are displayed */}
-                    {parentGroup && (
+                    {isLastColumn && parentGroup && (
                       <div className="m-1 mb-2 p-3 bg-[var(--control-secondary)] border border-[var(--border)] rounded-xl">
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-sm font-medium text-[var(--label-primary)]">
