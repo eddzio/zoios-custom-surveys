@@ -131,7 +131,7 @@ export const SectionBlock: React.FC<SectionBlockProps> = ({
               </button>
               <button
                 onClick={handleSave}
-                className="h-10 px-4 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+                className="h-10 px-4 bg-[var(--control-primary)] text-[var(--control-secondary)] text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity"
               >
                 Save
               </button>

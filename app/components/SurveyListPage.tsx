@@ -115,7 +115,7 @@ const SurveyStatusLabel = ({ survey }: { survey: Survey }) => {
   if (survey.status === "draft") {
     return (
       <span
-        className="inline-flex items-center h-6 px-2 rounded-md text-xs font-medium bg-[var(--bg-neutral)] border border-stone-200 text-stone-800"
+        className="inline-flex items-center h-6 px-2 rounded-md text-xs font-medium bg-[var(--bg-neutral)] border border-[var(--border)] text-[var(--label-primary)]"
         style={{ fontFamily: 'Poppins, sans-serif' }}
       >
         Not sent
@@ -228,7 +228,7 @@ export const SurveyListPage: React.FC<SurveyListPageProps> = ({
         </h1>
         <button
           onClick={onCreateSurvey}
-          className="h-10 px-4 bg-[var(--control-primary)] text-white text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
+          className="h-10 px-4 bg-[var(--control-primary)] text-[var(--control-secondary)] text-base font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
           style={{ fontFamily: 'Poppins, sans-serif' }}
         >
           Create survey

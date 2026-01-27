@@ -798,7 +798,7 @@ export default function Home() {
                   <div className="flex items-center gap-2 ml-2 shrink-0">
                     <button
                       onClick={handleSaveTitle}
-                      className="h-10 px-4 bg-[var(--control-primary)] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
+                      className="h-10 px-4 bg-[var(--control-primary)] text-[var(--control-secondary)] text-sm font-medium rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
                     >
                       Save
                     </button>
