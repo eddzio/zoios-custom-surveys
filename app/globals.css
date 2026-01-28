@@ -6,7 +6,7 @@
   --accent: #f5855c;
   --accent-hover: #ee7245;
   /* Default to light mode */
-  --background: #fafaf9;
+  --background: #fffaf6;
   --foreground: #292524;
   --label-primary: #292524;
   --label-secondary: #79716b;
@@ -18,48 +18,50 @@
   --border-negative: #FB7185;
   --bg-card: #ffffff;
   --bg-neutral: #f5f5f4;
+  --bg-primary: #ffffff;
   --control-primary: #292524;
   --control-secondary: #ffffff;
   --brand-primary: oklch(63.28% 0.1819 23.90);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #fafaf9;
-    --foreground: #292524;
-    --label-primary: #292524;
-    --label-secondary: #79716b;
-    --label-tertiary: #a8a29e;
-    --label-light: #79716b;
-    --label-negative: #E11D48;
-    --border: #E7E5E4;
-    --border-neutral: #a6a09b;
-    --border-negative: #FB7185;
-    --bg-card: #ffffff;
-    --bg-neutral: #f5f5f4;
-    --control-primary: #292524;
-    --control-secondary: #ffffff;
-    --brand-primary: oklch(63.28% 0.1819 23.90);
-  }
+/* Light mode (default and explicit) */
+:root,
+:root.light {
+  --background: #fffaf6;
+  --foreground: #292524;
+  --label-primary: #292524;
+  --label-secondary: #79716b;
+  --label-tertiary: #a8a29e;
+  --label-light: #79716b;
+  --label-negative: #E11D48;
+  --border: #E7E5E4;
+  --border-neutral: #a6a09b;
+  --border-negative: #FB7185;
+  --bg-card: #ffffff;
+  --bg-neutral: #f5f5f4;
+  --bg-primary: #ffffff;
+  --control-primary: #292524;
+  --control-secondary: #ffffff;
+  --brand-primary: oklch(63.28% 0.1819 23.90);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1c1917;
-    --foreground: #f5f5f4;
-    --label-primary: #f5f5f4;
-    --label-secondary: #a8a29e;
-    --label-tertiary: #78716c;
-    --label-light: #a8a29e;
-    --label-negative: #FB7185;
-    --border: #44403c;
-    --border-neutral: #57534e;
-    --border-negative: #E11D48;
-    --bg-card: #292524;
-    --bg-neutral: #44403c;
-    --control-primary: #f5f5f4;
-    --control-secondary: #292524;
-  }
+/* Dark mode */
+:root.dark {
+  --background: #1c1917;
+  --foreground: #f5f5f4;
+  --label-primary: #f5f5f4;
+  --label-secondary: #a8a29e;
+  --label-tertiary: #78716c;
+  --label-light: #a8a29e;
+  --label-negative: #FB7185;
+  --border: #44403c;
+  --border-neutral: #57534e;
+  --border-negative: #E11D48;
+  --bg-card: #292524;
+  --bg-neutral: #44403c;
+  --bg-primary: #292524;
+  --control-primary: #f5f5f4;
+  --control-secondary: #292524;
 }
 
 body {

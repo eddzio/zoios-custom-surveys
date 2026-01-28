@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle, MoreVertical, Users } from "react-feather";
+import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle, MoreVertical, Users, Sun, Moon } from "react-feather";
 import { toast } from "sonner";
 import { StepNavigation } from "./components/StepNavigation";
 import { QuestionListSidebar, QuestionItem, Section } from "./components/QuestionListSidebar";
@@ -184,6 +184,35 @@ const initialSurveys: Survey[] = [
 ];
 
 export default function Home() {
+  // Theme state
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setIsDarkMode(true);
+      document.documentElement.classList.add("dark");
+    } else if (savedTheme === "light") {
+      setIsDarkMode(false);
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => {
+      const newValue = !prev;
+      if (newValue) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      return newValue;
+    });
+  };
+
   // View state: "list" shows survey list, "editor" shows survey editor, "groups" shows groups management
   const [currentView, setCurrentView] = useState<"list" | "editor" | "groups">("list");
   const [surveys, setSurveys] = useState<Survey[]>(initialSurveys);
@@ -660,6 +689,13 @@ export default function Home() {
 
         {/* Bottom icons */}
         <div className="mt-auto flex flex-col items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors"
+            title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
           <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
             <HelpCircle size={20} />
           </button>
