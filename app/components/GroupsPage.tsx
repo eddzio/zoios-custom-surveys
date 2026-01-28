@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback, useMemo, createContext, useContext } from "react";
-import { Search, Users, User, ChevronRight, ChevronDown, X, Award } from "react-feather";
+import { Search, Users, User, ChevronRight, ChevronDown, X, Award, MinusCircle } from "react-feather";
 import {
   ReactFlow,
   Node,
@@ -254,6 +254,121 @@ const mockMembers: Member[] = [
   { id: "m-6", name: "Idris Elba", email: "ie@zoios.io", status: "Active" },
 ];
 
+// Mock subgroups data for hierarchy view
+interface SubgroupInfo {
+  id: string;
+  category: string;
+  name: string;
+  owner: string;
+  memberCount: number;
+  childCount: number;
+}
+
+const mockSubgroups: SubgroupInfo[] = [
+  { id: "sg-1", category: "Department", name: "Analytics engineering", owner: "John Tartakovski", memberCount: 5, childCount: 5 },
+  { id: "sg-2", category: "Department", name: "Data analysts", owner: "John Tartakovski", memberCount: 5, childCount: 5 },
+  { id: "sg-3", category: "Department", name: "Data science", owner: "John Tartakovski", memberCount: 5, childCount: 5 },
+];
+
+// Mini hierarchy chart for popup
+interface HierarchyChartProps {
+  currentGroupName: string;
+  parentName?: string;
+  siblings?: string[];
+}
+
+function HierarchyMiniChart({ currentGroupName, parentName = "Product", siblings = ["Sales", "Development"] }: HierarchyChartProps) {
+  const [selectedNodeId, setSelectedNodeId] = useState<string>(currentGroupName);
+
+  // Build nodes and edges for the mini hierarchy
+  const { nodes, edges } = useMemo(() => {
+    const nodeWidth = 140;
+    const nodeHeight = 36;
+    const horizontalGap = 20;
+    const verticalGap = 60;
+
+    const allChildren = [siblings[0] || "Sales", currentGroupName, siblings[1] || "Development"].filter(Boolean);
+    const totalWidth = allChildren.length * nodeWidth + (allChildren.length - 1) * horizontalGap;
+    const startX = -totalWidth / 2 + nodeWidth / 2;
+
+    const nodes: Node[] = [
+      // Parent node
+      {
+        id: parentName,
+        position: { x: 0, y: 0 },
+        data: { label: parentName },
+        type: "default",
+        style: {
+          width: nodeWidth,
+          height: nodeHeight,
+          padding: "6px 10px",
+          borderRadius: "8px",
+          border: "1px solid var(--border)",
+          backgroundColor: "var(--bg-primary)",
+          fontSize: "13px",
+          fontWeight: 500,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+      },
+      // Child nodes (siblings + current)
+      ...allChildren.map((name, index) => ({
+        id: name,
+        position: { x: startX + index * (nodeWidth + horizontalGap), y: nodeHeight + verticalGap },
+        data: { label: name },
+        type: "default",
+        style: {
+          width: nodeWidth,
+          height: nodeHeight,
+          padding: "6px 10px",
+          borderRadius: "8px",
+          border: name === currentGroupName ? "2px solid var(--control-primary)" : "1px solid var(--border)",
+          backgroundColor: "var(--bg-primary)",
+          fontSize: "13px",
+          fontWeight: name === currentGroupName ? 600 : 500,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: name === currentGroupName ? "0 0 0 3px rgba(41, 37, 36, 0.1)" : "none",
+        },
+      })),
+    ];
+
+    const edges: Edge[] = allChildren.map((name) => ({
+      id: `${parentName}-${name}`,
+      source: parentName,
+      target: name,
+      type: "default",
+      style: { stroke: "var(--border-neutral)", strokeWidth: 1.5 },
+    }));
+
+    return { nodes, edges };
+  }, [currentGroupName, parentName, siblings]);
+
+  return (
+    <div className="h-[200px] w-full border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-neutral)]">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={false}
+        panOnDrag={false}
+        zoomOnScroll={false}
+        zoomOnPinch={false}
+        zoomOnDoubleClick={false}
+        fitView
+        fitViewOptions={{ padding: 0.3 }}
+        minZoom={0.5}
+        maxZoom={1}
+      >
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--border)" />
+      </ReactFlow>
+    </div>
+  );
+}
+
 // Edit Group Popup Component
 interface EditGroupPopupProps {
   group: Group | { name: string; owner: string | null; memberCount: number };
@@ -271,10 +386,13 @@ function EditGroupPopup({ group, onClose }: EditGroupPopupProps) {
         onClick={onClose}
       />
       {/* Popup */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-[580px] max-h-[80vh] flex flex-col overflow-hidden">
+      <div className="relative bg-white rounded-2xl shadow-xl w-[580px] h-[600px] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--border)]">
-          <h2 className="text-xl font-semibold text-[var(--label-primary)]">
+          <h2
+            className="text-xl font-semibold text-[var(--label-primary)]"
+            style={{ fontFamily: "Bitter, serif", letterSpacing: "-0.4px" }}
+          >
             {group.name}
           </h2>
           <button
@@ -315,7 +433,10 @@ function EditGroupPopup({ group, onClose }: EditGroupPopupProps) {
             <div className="flex flex-col gap-6">
               {/* Group responsible section */}
               <div>
-                <h3 className="text-base font-medium text-[var(--label-primary)] mb-1">
+                <h3
+                  className="text-base font-semibold text-[var(--label-primary)] mb-1"
+                  style={{ fontFamily: "Bitter, serif" }}
+                >
                   Group responsible
                 </h3>
                 <p className="text-sm text-[var(--label-light)] mb-3">
@@ -330,7 +451,10 @@ function EditGroupPopup({ group, onClose }: EditGroupPopupProps) {
               {/* Members section */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-base font-medium text-[var(--label-primary)]">
+                  <h3
+                    className="text-base font-semibold text-[var(--label-primary)]"
+                    style={{ fontFamily: "Bitter, serif" }}
+                  >
                     Members · {mockMembers.length}
                   </h3>
                   <button className="flex items-center gap-2 h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--label-primary)]">
@@ -367,8 +491,84 @@ function EditGroupPopup({ group, onClose }: EditGroupPopupProps) {
           )}
 
           {activeTab === "hierarchy" && (
-            <div className="text-sm text-[var(--label-light)]">
-              Hierarchy view coming soon...
+            <div className="flex flex-col gap-6">
+              {/* Groups below section */}
+              <div>
+                <div className="flex items-start justify-between mb-1">
+                  <div>
+                    <h3
+                      className="text-base font-semibold text-[var(--label-primary)]"
+                      style={{ fontFamily: "Bitter, serif" }}
+                    >
+                      Groups below
+                    </h3>
+                    <p className="text-sm text-[var(--label-light)] mt-1">
+                      The members of this group will see the analytics of the subgroups you add here.
+                      <br />
+                      This includes all the subgroups below each branch.
+                    </p>
+                  </div>
+                  <button className="flex items-center gap-2 h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--label-primary)] whitespace-nowrap">
+                    Add group below
+                  </button>
+                </div>
+
+                {/* Subgroups list */}
+                <div className="flex flex-col gap-2 mt-4">
+                  {mockSubgroups.map((subgroup) => (
+                    <div
+                      key={subgroup.id}
+                      className="flex items-center gap-3 px-3 py-2 border border-[var(--border)] rounded-lg"
+                    >
+                      <span className="px-2 py-0.5 bg-[var(--bg-neutral)] rounded text-xs text-[var(--label-light)] font-medium">
+                        {subgroup.category}
+                      </span>
+                      <span className="flex-1 text-sm font-medium text-[var(--label-primary)]">
+                        {subgroup.name}
+                      </span>
+                      <div className="flex items-center gap-1 text-[var(--label-light)]">
+                        <User size={14} />
+                        <span className="text-sm">{subgroup.owner}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[var(--label-light)]">
+                        <Users size={14} />
+                        <span className="text-sm">{subgroup.memberCount}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[var(--label-light)]">
+                        <Users size={14} />
+                        <span className="text-sm">{subgroup.childCount}</span>
+                      </div>
+                      <button className="text-red-500 hover:text-red-600 transition-colors">
+                        <MinusCircle size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hierarchy chart section */}
+              <div>
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3
+                      className="text-base font-semibold text-[var(--label-primary)]"
+                      style={{ fontFamily: "Bitter, serif" }}
+                    >
+                      Hierarchy chart
+                    </h3>
+                    <p className="text-sm text-[var(--label-light)] mt-1">
+                      Shows how this group related to others
+                    </p>
+                  </div>
+                  <button className="flex items-center gap-2 h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--label-primary)]">
+                    <span>Add members</span>
+                    <ChevronDown size={14} />
+                  </button>
+                </div>
+
+                {/* Mini hierarchy chart */}
+                <HierarchyMiniChart currentGroupName={group.name} />
+              </div>
             </div>
           )}
         </div>
