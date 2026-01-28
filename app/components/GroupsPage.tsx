@@ -723,47 +723,77 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
           >
             {columns.map((column, columnIndex) => {
               // Find the parent group for this column (to show the chrome)
-              // Only show chrome in the last column
-              const isLastColumn = columnIndex === columns.length - 1;
               const parentGroupId = columnIndex > 0 ? selectedPath[columnIndex] : null;
               const parentGroup = parentGroupId
                 ? findGroupByPath(categories, selectedPath.slice(0, columnIndex + 1))
                 : null;
 
+              // Calculate total member count for category (first column)
+              const categoryMemberCount = selectedCategory
+                ? selectedCategory.groups.reduce((sum, g) => sum + g.memberCount, 0)
+                : 0;
+
               return (
                 <div
                   key={columnIndex}
-                  className="w-64 flex-shrink-0 border-r border-[var(--border)] flex flex-col"
+                  className="w-[280px] flex-shrink-0 border-r border-[var(--border)] flex flex-col"
                 >
-                  <div className="flex-1 overflow-y-auto p-1">
-                    {/* Chrome - shows info about the parent group whose children are displayed */}
-                    {isLastColumn && parentGroup && (
-                      <div className="m-1 mb-2 p-3 bg-[var(--control-secondary)] border border-[var(--border)] rounded-xl">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-medium text-[var(--label-primary)]">
-                            {parentGroup.name}
-                          </span>
-                          <div className="flex items-center gap-1 text-[var(--label-light)]">
-                            <Users size={14} />
-                            <span className="text-xs">
-                              {parentGroup.memberCount}
+                  <div className="flex-1 overflow-y-auto p-2">
+                    {/* Chrome - shows info about the parent of items in this column */}
+                    {columnIndex === 0 && selectedCategory ? (
+                      <div className="px-2 py-4 border-b border-[var(--border)] flex flex-col gap-3">
+                        <div className="flex flex-col">
+                          <div className="flex items-center justify-between">
+                            <span className="text-base font-medium text-[var(--label-primary)]">
+                              {selectedCategory.name}
                             </span>
+                            <div className="flex items-center gap-1 text-[var(--label-primary)]">
+                              <Users size={14} />
+                              <span className="text-base">
+                                {categoryMemberCount}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 text-[var(--label-light)]">
+                            <span className="text-base">No responsible</span>
+                            <Award size={14} />
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 mb-3 text-[var(--label-secondary)]">
-                          <User size={14} />
-                          <span className="text-sm">
-                            {parentGroup.owner || "No owner"}
-                          </span>
-                        </div>
                         <button
-                          onClick={() => handleEditGroup(parentGroup.id)}
-                          className="h-10 px-4 bg-[var(--control-secondary)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors"
+                          className="w-full h-10 px-4 bg-[var(--control-secondary)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors shadow-[0px_1px_3px_0px_rgba(0,0,0,0.04)]"
                         >
                           Edit group
                         </button>
                       </div>
-                    )}
+                    ) : parentGroup ? (
+                      <div className="px-2 py-4 border-b border-[var(--border)] flex flex-col gap-3">
+                        <div className="flex flex-col">
+                          <div className="flex items-center justify-between">
+                            <span className="text-base font-medium text-[var(--label-primary)]">
+                              {parentGroup.name}
+                            </span>
+                            <div className="flex items-center gap-1 text-[var(--label-primary)]">
+                              <Users size={14} />
+                              <span className="text-base">
+                                {parentGroup.memberCount}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 text-[var(--label-light)]">
+                            <span className="text-base">
+                              {parentGroup.owner || "No responsible"}
+                            </span>
+                            <Award size={14} />
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleEditGroup(parentGroup.id)}
+                          className="w-full h-10 px-4 bg-[var(--control-secondary)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors shadow-[0px_1px_3px_0px_rgba(0,0,0,0.04)]"
+                        >
+                          Edit group
+                        </button>
+                      </div>
+                    ) : null}
                     {column.groups.map((group) => {
                       const isSelected =
                         selectedPath[columnIndex + 1] === group.id;
