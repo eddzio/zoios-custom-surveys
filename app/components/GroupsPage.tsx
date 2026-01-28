@@ -1,19 +1,20 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo, createContext, useContext } from "react";
 import { Search, Users, User, ChevronRight, X, Award } from "react-feather";
 import {
   ReactFlow,
   Node,
   Edge,
-  useNodesState,
-  useEdgesState,
   Background,
   BackgroundVariant,
   Controls,
   MarkerType,
+  Handle,
+  Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { Plus } from "react-feather";
 
 // Types
 interface Group {
@@ -873,7 +874,18 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
         {activeTab === "chart" && (
           <div className="flex-1 flex flex-col overflow-hidden">
             {selectedCategory ? (
-              <ChartView groups={selectedCategory.groups} />
+              <ChartView
+                groups={selectedCategory.groups}
+                onGroupsChange={(newGroups) => {
+                  setCategories((prev) =>
+                    prev.map((cat) =>
+                      cat.id === selectedCategoryId
+                        ? { ...cat, groups: newGroups }
+                        : cat
+                    )
+                  );
+                }}
+              />
             ) : (
               <div className="flex-1 flex items-center justify-center text-[var(--label-light)]">
                 Select a category to view chart
@@ -886,37 +898,217 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
   );
 }
 
-// Chart view component
-function ChartView({ groups }: { groups: Group[] }) {
-  const { nodes: initialNodes, edges: initialEdges } = groupsToFlow(groups);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+// Context for chart callbacks
+interface ChartContextType {
+  selectedNodeId: string | null;
+  editingNodeId: string | null;
+  onAddGroup: (nodeId: string) => void;
+  onNameChange: (name: string) => void;
+  onFinishEditing: () => void;
+}
 
-  // Update nodes/edges when groups change
+const ChartContext = createContext<ChartContextType | null>(null);
+
+// Custom node component
+interface GroupNodeData {
+  label: string;
+  nodeId: string;
+}
+
+function GroupNode({ data }: { data: GroupNodeData }) {
+  const ctx = useContext(ChartContext);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const isSelected = ctx?.selectedNodeId === data.nodeId;
+  const isEditing = ctx?.editingNodeId === data.nodeId;
+
   useEffect(() => {
-    const { nodes: newNodes, edges: newEdges } = groupsToFlow(groups);
-    setNodes(newNodes);
-    setEdges(newEdges);
-  }, [groups, setNodes, setEdges]);
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
 
   return (
-    <div className="flex-1 w-full h-full [&_.react-flow__handle]:hidden">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.1}
-        maxZoom={2}
-      >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--border)" />
-        <Controls showInteractive={false} />
-      </ReactFlow>
+    <div
+      className={`relative px-2.5 py-1.5 rounded-lg border bg-[var(--bg-primary)] text-[13px] font-medium text-[var(--label-primary)] ${
+        isSelected ? "border-[var(--control-primary)] ring-2 ring-[var(--control-primary)] ring-opacity-20" : "border-[var(--border)]"
+      }`}
+      style={{ minWidth: 140 }}
+    >
+      <Handle type="target" position={Position.Top} className="!hidden" />
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          type="text"
+          defaultValue={data.label}
+          onChange={(e) => ctx?.onNameChange(e.target.value)}
+          onBlur={() => ctx?.onFinishEditing()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") ctx?.onFinishEditing();
+            if (e.key === "Escape") ctx?.onFinishEditing();
+          }}
+          className="w-full bg-transparent outline-none text-center"
+        />
+      ) : (
+        <span className="block text-center">{data.label}</span>
+      )}
+      <Handle type="source" position={Position.Bottom} className="!hidden" />
+      {isSelected && !isEditing && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            ctx?.onAddGroup(data.nodeId);
+          }}
+          className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-1 bg-[var(--control-primary)] text-white text-xs font-medium rounded-md hover:bg-[var(--control-primary-hover)] transition-colors whitespace-nowrap"
+        >
+          <Plus size={12} />
+          Add group
+        </button>
+      )}
     </div>
+  );
+}
+
+const nodeTypes = { groupNode: GroupNode };
+
+// Chart view component
+function ChartView({
+  groups,
+  onGroupsChange,
+}: {
+  groups: Group[];
+  onGroupsChange: (groups: Group[]) => void;
+}) {
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
+  const editingNameRef = useRef<string>("");
+
+  // Helper to add child to a group recursively
+  const addChildToGroup = (groups: Group[], parentId: string, newChild: Group): Group[] => {
+    return groups.map((group) => {
+      if (group.id === parentId) {
+        return { ...group, children: [...group.children, newChild] };
+      }
+      if (group.children.length > 0) {
+        return {
+          ...group,
+          children: addChildToGroup(group.children, parentId, newChild),
+        };
+      }
+      return group;
+    });
+  };
+
+  // Helper to update group name recursively
+  const updateGroupName = (groups: Group[], groupId: string, newName: string): Group[] => {
+    return groups.map((group) => {
+      if (group.id === groupId) {
+        return { ...group, name: newName || "Empty group" };
+      }
+      if (group.children.length > 0) {
+        return {
+          ...group,
+          children: updateGroupName(group.children, groupId, newName),
+        };
+      }
+      return group;
+    });
+  };
+
+  const handleAddGroup = useCallback(
+    (parentId: string) => {
+      const newId = `g-new-${Date.now()}`;
+      const newGroup: Group = {
+        id: newId,
+        name: "Empty group",
+        owner: null,
+        memberCount: 0,
+        children: [],
+      };
+      const newGroups = addChildToGroup(groups, parentId, newGroup);
+      onGroupsChange(newGroups);
+      setSelectedNodeId(newId);
+      setEditingNodeId(newId);
+      editingNameRef.current = "Empty group";
+    },
+    [groups, onGroupsChange]
+  );
+
+  const handleFinishEditing = useCallback(() => {
+    if (editingNodeId) {
+      const newGroups = updateGroupName(groups, editingNodeId, editingNameRef.current);
+      onGroupsChange(newGroups);
+      setEditingNodeId(null);
+      editingNameRef.current = "";
+    }
+  }, [editingNodeId, groups, onGroupsChange]);
+
+  const handleNameChange = useCallback((name: string) => {
+    editingNameRef.current = name;
+  }, []);
+
+  // Build nodes
+  const { nodes, edges } = useMemo(() => {
+    const { nodes: baseNodes, edges } = groupsToFlow(groups);
+    const nodes = baseNodes.map((node) => ({
+      ...node,
+      type: "groupNode",
+      // Remove visual styles since GroupNode handles its own styling
+      // Keep only position-related properties
+      style: undefined,
+      data: {
+        label: node.data.label,
+        nodeId: node.id,
+      },
+    }));
+    return { nodes, edges };
+  }, [groups]);
+
+  const contextValue = useMemo<ChartContextType>(() => ({
+    selectedNodeId,
+    editingNodeId,
+    onAddGroup: handleAddGroup,
+    onNameChange: handleNameChange,
+    onFinishEditing: handleFinishEditing,
+  }), [selectedNodeId, editingNodeId, handleAddGroup, handleNameChange, handleFinishEditing]);
+
+  const handleNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      if (editingNodeId && editingNodeId !== node.id) {
+        handleFinishEditing();
+      }
+      setSelectedNodeId(node.id);
+    },
+    [editingNodeId, handleFinishEditing]
+  );
+
+  const handlePaneClick = useCallback(() => {
+    if (editingNodeId) {
+      handleFinishEditing();
+    }
+    setSelectedNodeId(null);
+  }, [editingNodeId, handleFinishEditing]);
+
+  return (
+    <ChartContext.Provider value={contextValue}>
+      <div className="flex-1 w-full h-full [&_.react-flow__handle]:hidden">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodeClick={handleNodeClick}
+          onPaneClick={handlePaneClick}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          fitView
+          fitViewOptions={{ padding: 0.2 }}
+          minZoom={0.1}
+          maxZoom={2}
+        >
+          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--border)" />
+          <Controls showInteractive={false} />
+        </ReactFlow>
+      </div>
+    </ChartContext.Provider>
   );
 }
