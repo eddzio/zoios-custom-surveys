@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Home as HomeIcon, PlusCircle, Settings, User, HelpCircle, MoreVertical, Users, Sun, Moon } from "react-feather";
+import { Clipboard, User, HelpCircle, MoreVertical, Users, Sun, Moon } from "react-feather";
 import { toast } from "sonner";
 import { StepNavigation } from "./components/StepNavigation";
 import { QuestionListSidebar, QuestionItem, Section } from "./components/QuestionListSidebar";
@@ -659,9 +659,6 @@ export default function Home() {
 
         {/* Nav icons */}
         <div className="flex flex-col items-center gap-2">
-          <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
-            <HomeIcon size={20} />
-          </button>
           <button
             onClick={() => setCurrentView("list")}
             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
@@ -670,7 +667,7 @@ export default function Home() {
                 : "text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)]"
             }`}
           >
-            <PlusCircle size={20} />
+            <Clipboard size={20} />
           </button>
           <button
             onClick={() => setCurrentView("groups")}
@@ -681,9 +678,6 @@ export default function Home() {
             }`}
           >
             <Users size={20} />
-          </button>
-          <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
-            <Settings size={20} />
           </button>
         </div>
 
@@ -696,12 +690,7 @@ export default function Home() {
           >
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
-          <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
-            <HelpCircle size={20} />
-          </button>
-          <button className="w-10 h-10 rounded-lg flex items-center justify-center text-[var(--label-light)] hover:bg-[var(--bg-neutral)] hover:text-[var(--label-primary)] transition-colors">
-            <User size={20} />
-          </button>
+
         </div>
       </div>
 
