@@ -928,9 +928,12 @@ export default function Home() {
                       sectionIndex++;
                     }
 
+                    let questionIndex = 0;
                     return items.map((item) => {
                       if (item.type === 'question') {
                         const question = item.data as QuestionItem;
+                        const currentQuestionNumber = String(questionIndex + 1);
+                        questionIndex++;
                         return (
                           <motion.div
                             key={`question-${question.id}`}
@@ -951,7 +954,7 @@ export default function Home() {
                             className={`relative cursor-pointer ${selectedQuestionId === question.id ? "ring-1 ring-[var(--control-primary)] ring-opacity-30 rounded-2xl" : ""}`}
                           >
                             <QuestionDetailPanel
-                              questionNumber={question.number}
+                              questionNumber={currentQuestionNumber}
                               questionText={question.questionText}
                               description={question.description}
                               questionType={question.questionType}

@@ -137,6 +137,7 @@ const SectionDivider = ({
 
 const QuestionRow = ({
   question,
+  displayNumber,
   isSelected,
   onClick,
   onMoveUp,
@@ -145,6 +146,7 @@ const QuestionRow = ({
   canMoveDown = true,
 }: {
   question: QuestionItem;
+  displayNumber: string;
   isSelected: boolean;
   onClick: () => void;
   onMoveUp?: () => void;
@@ -167,7 +169,7 @@ const QuestionRow = ({
         className="flex-shrink-0 w-[18px] text-sm font-mono overflow-hidden text-ellipsis"
         style={{ fontFamily: 'DM Mono, monospace' }}
       >
-        {question.number}
+        {displayNumber}
       </span>
       <span
         className="flex-1 overflow-hidden min-w-0"
@@ -178,7 +180,7 @@ const QuestionRow = ({
           WebkitBoxOrient: 'vertical',
         }}
       >
-        {question.questionText || `Question ${question.number}`}
+        {question.questionText || `Question ${displayNumber}`}
       </span>
       {onMoveUp && onMoveDown && (
         <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
@@ -272,6 +274,7 @@ export const QuestionListSidebar: React.FC<QuestionListSidebarProps> = ({
                 >
                   <QuestionRow
                     question={question}
+                    displayNumber={String(questionIndex + 1)}
                     isSelected={selectedQuestionId === question.id}
                     onClick={() => onQuestionSelect?.(question.id)}
                     onMoveUp={onMoveQuestion ? () => onMoveQuestion(question.id, "up") : undefined}
