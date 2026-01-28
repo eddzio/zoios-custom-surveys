@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback, useMemo, createContext, useContext } from "react";
-import { Search, Users, User, ChevronRight, X, Award } from "react-feather";
+import { Search, Users, User, ChevronRight, ChevronDown, X, Award } from "react-feather";
 import {
   ReactFlow,
   Node,
@@ -237,6 +237,146 @@ const mockCategories: Category[] = [
   },
 ];
 
+// Mock member data
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+  status: "Active" | "Inactive" | "Pending";
+}
+
+const mockMembers: Member[] = [
+  { id: "m-1", name: "Alyssa Milano", email: "am@zoios.io", status: "Active" },
+  { id: "m-2", name: "Javier Bardem", email: "jb@zoios.io", status: "Active" },
+  { id: "m-3", name: "Mila Kunis", email: "ml@zoios.io", status: "Active" },
+  { id: "m-4", name: "Keanu Reeves", email: "kr@zoios.io", status: "Active" },
+  { id: "m-5", name: "Scarlett Johansson", email: "sj@zoios.io", status: "Active" },
+  { id: "m-6", name: "Idris Elba", email: "ie@zoios.io", status: "Active" },
+];
+
+// Edit Group Popup Component
+interface EditGroupPopupProps {
+  group: Group | { name: string; owner: string | null; memberCount: number };
+  onClose: () => void;
+}
+
+function EditGroupPopup({ group, onClose }: EditGroupPopupProps) {
+  const [activeTab, setActiveTab] = useState<"members" | "hierarchy">("members");
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/20"
+        onClick={onClose}
+      />
+      {/* Popup */}
+      <div className="relative bg-white rounded-2xl shadow-xl w-[580px] max-h-[80vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--border)]">
+          <h2 className="text-xl font-semibold text-[var(--label-primary)]">
+            {group.name}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-1 text-[var(--label-light)] hover:text-[var(--label-primary)] transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-[var(--border)]">
+          <button
+            onClick={() => setActiveTab("members")}
+            className={`px-6 py-3 text-base font-medium transition-colors ${
+              activeTab === "members"
+                ? "text-[var(--label-primary)] border-b-2 border-[var(--control-primary)]"
+                : "text-[var(--label-light)] hover:text-[var(--label-primary)]"
+            }`}
+          >
+            Members
+          </button>
+          <button
+            onClick={() => setActiveTab("hierarchy")}
+            className={`px-6 py-3 text-base font-medium transition-colors ${
+              activeTab === "hierarchy"
+                ? "text-[var(--label-primary)] border-b-2 border-[var(--control-primary)]"
+                : "text-[var(--label-light)] hover:text-[var(--label-primary)]"
+            }`}
+          >
+            Hierarchy
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {activeTab === "members" && (
+            <div className="flex flex-col gap-6">
+              {/* Group responsible section */}
+              <div>
+                <h3 className="text-base font-medium text-[var(--label-primary)] mb-1">
+                  Group responsible
+                </h3>
+                <p className="text-sm text-[var(--label-light)] mb-3">
+                  Employees that are part of this group
+                </p>
+                <button className="flex items-center justify-between w-full max-w-[200px] h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--label-light)]">
+                  <span>{group.owner || "Add responsible"}</span>
+                  <ChevronDown size={14} />
+                </button>
+              </div>
+
+              {/* Members section */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-base font-medium text-[var(--label-primary)]">
+                    Members · {mockMembers.length}
+                  </h3>
+                  <button className="flex items-center gap-2 h-10 px-3 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--label-primary)]">
+                    <span>Add members</span>
+                    <ChevronDown size={14} />
+                  </button>
+                </div>
+                <p className="text-sm text-[var(--label-light)] mb-4">
+                  Employees that are part of this group
+                </p>
+
+                {/* Members table */}
+                <div className="border border-[var(--border)] rounded-lg overflow-hidden">
+                  {/* Table header */}
+                  <div className="grid grid-cols-[1fr_1fr_100px] gap-4 px-4 py-3 bg-[var(--bg-neutral)] border-b border-[var(--border)]">
+                    <span className="text-sm font-medium text-[var(--label-light)]">Name</span>
+                    <span className="text-sm font-medium text-[var(--label-light)]">Email</span>
+                    <span className="text-sm font-medium text-[var(--label-light)]">Status</span>
+                  </div>
+                  {/* Table rows */}
+                  {mockMembers.map((member) => (
+                    <div
+                      key={member.id}
+                      className="grid grid-cols-[1fr_1fr_100px] gap-4 px-4 py-3 border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--bg-neutral)] transition-colors"
+                    >
+                      <span className="text-sm text-[var(--label-primary)]">{member.name}</span>
+                      <span className="text-sm text-[var(--label-primary)]">{member.email}</span>
+                      <span className="text-sm text-[var(--label-primary)]">{member.status}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "hierarchy" && (
+            <div className="text-sm text-[var(--label-light)]">
+              Hierarchy view coming soon...
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Helper to find group by path
 const findGroupByPath = (
   categories: Category[],
@@ -397,6 +537,10 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
   } | null>(null);
   const [newSiblingName, setNewSiblingName] = useState("");
   const [activeTab, setActiveTab] = useState<"columns" | "chart">("columns");
+  const [editingGroup, setEditingGroup] = useState<{
+    group: Group | { name: string; owner: string | null; memberCount: number };
+    isCategory: boolean;
+  } | null>(null);
 
   const columnsContainerRef = useRef<HTMLDivElement>(null);
   const categoryInputRef = useRef<HTMLInputElement>(null);
@@ -760,9 +904,17 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                           </div>
                         </div>
                         <button
+                          onClick={() => setEditingGroup({
+                            group: {
+                              name: selectedCategory.name,
+                              owner: null,
+                              memberCount: categoryMemberCount,
+                            },
+                            isCategory: true,
+                          })}
                           className="w-full h-10 px-4 bg-[var(--control-secondary)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors shadow-[0px_1px_3px_0px_rgba(0,0,0,0.04)]"
                         >
-                          Edit group
+                          Edit
                         </button>
                       </div>
                     ) : parentGroup ? (
@@ -787,10 +939,13 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
                           </div>
                         </div>
                         <button
-                          onClick={() => handleEditGroup(parentGroup.id)}
+                          onClick={() => setEditingGroup({
+                            group: parentGroup,
+                            isCategory: false,
+                          })}
                           className="w-full h-10 px-4 bg-[var(--control-secondary)] border border-[var(--border)] text-[var(--label-primary)] text-sm font-medium rounded-lg hover:bg-[var(--bg-neutral)] transition-colors shadow-[0px_1px_3px_0px_rgba(0,0,0,0.04)]"
                         >
-                          Edit group
+                          Edit
                         </button>
                       </div>
                     ) : null}
@@ -924,6 +1079,14 @@ export function GroupsPage({ onEditGroup }: GroupsPageProps) {
           </div>
         )}
       </div>
+
+      {/* Edit Group Popup */}
+      {editingGroup && (
+        <EditGroupPopup
+          group={editingGroup.group}
+          onClose={() => setEditingGroup(null)}
+        />
+      )}
     </div>
   );
 }
